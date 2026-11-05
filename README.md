@@ -360,7 +360,7 @@ body {
         <h1 class="archive-title">理想狀態</h1>
 
         <p class="archive-subtitle">
-          當代個人檔案與系統診斷報告
+          個人焦慮檔案與系統診斷報告
           <span class="text-gray-600">/</span>
           Archive Portal
         </p>
@@ -680,7 +680,7 @@ body {
         <section class="space-y-1.5">
 
           <h3 class="text-emerald-500 font-mono font-bold text-xs">
-            01. 創作發想：當代異化與假期的罪惡感
+            01. 假期的罪惡感
           </h3>
 
           <p class="text-gray-400">
@@ -692,7 +692,7 @@ body {
         <section class="space-y-1.5">
 
           <h3 class="text-emerald-500 font-mono font-bold text-xs">
-            02. 核心概念：生產一件代替我停止生產的作品
+            02. 生產一件代替我停止生產的作品
           </h3>
 
           <p class="text-gray-400">
@@ -763,7 +763,7 @@ const PARTICIPANTS = [
     birthDate: "2005-02-26",
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-96d3b302-64c7-4d0a-92c3-dae869f734ea.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-10-27-116824ad-2295-48ab-bfc1-92ff1656d47d.jpg",
-    signatureUrl: "https://cdn.phototourl.com/member/2026-11-05-7ed46c63-a806-4f29-b201-d401880f6bcb.jpg", // 在此填入簽名圖片網址
+    signatureUrl: "https://cdn.phototourl.com/member/2026-11-05-d60ba6dd-f98d-46c8-95b2-bfb4fbbb9f1b.jpg", // 在此填入簽名圖片網址
     statement: "我發現自己根本無法忍受純粹的放空。只要一停下來，那種『時間正被浪費』的罪惡感就會把我吞噬。我做這個替身，不是為了讓自己舒服地去休息，而是因為我停不下來——我需要一個實體掛在那裡，替我承擔什麼都不做、只剩下呼吸的死寂。"
   },
   {
