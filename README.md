@@ -631,7 +631,7 @@ body {
 
       </div>
 
-      <!-- 官方授權與簽名欄（無框設計，高度放大至 120px，黑底白字） -->
+      <!-- 官方授權與簽名欄（背景與區塊融為一體，透明融合） -->
       <div class="bg-gray-950/90 rounded-lg p-6 border border-gray-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono">
         <div>
           <span class="text-[10px] text-emerald-400 tracking-widest block mb-1">
@@ -643,7 +643,7 @@ body {
         </div>
 
         <div class="flex items-center justify-center min-w-[160px] h-[120px] relative overflow-hidden shrink-0">
-          <img id="detail-signature-img" src="" alt="Principal Signature" class="max-h-28 max-w-[180px] object-contain opacity-95 hidden">
+          <img id="detail-signature-img" src="" alt="Principal Signature" class="max-h-28 max-w-[180px] object-contain opacity-95 mix-blend-screen hidden">
           <span id="detail-signature-placeholder" class="text-[10px] text-gray-600 tracking-widest">
             PENDING SEAL
           </span>
@@ -751,7 +751,7 @@ body {
 </div>
 
 <script>
-/* 個案資料（在此處的 signatureUrl 填入你處理好的白字黑底簽名圖片網址） */
+/* 個案資料 */
 
 const PARTICIPANTS = [
   {
@@ -763,7 +763,7 @@ const PARTICIPANTS = [
     birthDate: "2005-02-26",
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-96d3b302-64c7-4d0a-92c3-dae869f734ea.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-10-27-116824ad-2295-48ab-bfc1-92ff1656d47d.jpg",
-    signatureUrl: "https://cdn.phototourl.com/member/2026-11-05-d60ba6dd-f98d-46c8-95b2-bfb4fbbb9f1b.jpg", // 在此填入簽名圖片網址
+    signatureUrl: "https://cdn.phototourl.com/member/2026-11-05-d60ba6dd-f98d-46c8-95b2-bfb4fbbb9f1b.jpg",
     statement: "我發現自己根本無法忍受純粹的放空。只要一停下來，那種『時間正被浪費』的罪惡感就會把我吞噬。我做這個替身，不是為了讓自己舒服地去休息，而是因為我停不下來——我需要一個實體掛在那裡，替我承擔什麼都不做、只剩下呼吸的死寂。"
   },
   {
@@ -775,7 +775,7 @@ const PARTICIPANTS = [
     birthDate: "2005-07-10",
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-09d06678-a47a-49da-b2bb-c6197ce8a8ea.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-10-25-9afd07b5-083e-4c4d-a816-f5d9519e8f92.jpg",
-    signatureUrl: "", // 在此填入簽名圖片網址
+    signatureUrl: "",
     statement: "只要超過半天沒有打開繪圖軟體或思考進度，我就會產生一種即將被同齡人徹底淘汰的恐慌。明明身體已經累到極限，但大腦還是強迫性地尋找事情做。我需要這台機器幫我把『休息』當成一項公事來認真執行。"
   },
   {
@@ -787,7 +787,7 @@ const PARTICIPANTS = [
     birthDate: "2005-06-09",
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-b70cd799-0bbf-4737-a890-d4c0962fe741.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-10-27-4e230bf1-0d8a-429f-b28d-9e4734ace26d.jpg",
-    signatureUrl: "", // 在此填入簽名圖片網址
+    signatureUrl: "",
     statement: "休假對我來說不是放鬆，而是一場審判。躺在床上滑手機的每一分鐘，都在盤算著自己少做了多少事。如果一定要有人在那裡放空，那就讓這顆塑膠薄膜包覆的人頭替我坐牢吧。"
   },
   {
@@ -799,7 +799,7 @@ const PARTICIPANTS = [
     birthDate: "2005-01-01",
     imageUrl: "",
     deviceImageUrl: "",
-    signatureUrl: "", // 在此填入簽名圖片網址
+    signatureUrl: "",
     statement: "檔案建立中，等待資料輸入..."
   }
 ];
