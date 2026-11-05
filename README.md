@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -632,7 +631,7 @@ body {
 
       </div>
 
-      <!-- 官方授權與簽名欄（照片簽名） -->
+      <!-- 官方授權與簽名欄（無白框設計） -->
       <div class="bg-gray-950/90 rounded-lg p-6 border border-gray-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono">
         <div>
           <span class="text-[10px] text-emerald-400 tracking-widest block mb-1">
@@ -643,7 +642,7 @@ body {
           </p>
         </div>
 
-        <div class="bg-black/60 border border-gray-800 rounded p-2 flex items-center justify-center min-w-[160px] h-[60px] relative overflow-hidden shrink-0">
+        <div class="flex items-center justify-center min-w-[160px] h-[60px] relative overflow-hidden shrink-0">
           <img id="detail-signature-img" src="" alt="Principal Signature" class="max-h-12 max-w-[150px] object-contain filter invert opacity-85 hidden">
           <span id="detail-signature-placeholder" class="text-[10px] text-gray-600 tracking-widest">
             PENDING SEAL
@@ -1145,5 +1144,3 @@ window.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
-```
