@@ -631,7 +631,7 @@ body {
 
       </div>
 
-      <!-- 官方授權與簽名欄（無白框設計） -->
+      <!-- 官方授權與簽名欄（無框設計，高度放大至 120px，黑底白字） -->
       <div class="bg-gray-950/90 rounded-lg p-6 border border-gray-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono">
         <div>
           <span class="text-[10px] text-emerald-400 tracking-widest block mb-1">
@@ -642,8 +642,8 @@ body {
           </p>
         </div>
 
-        <div class="flex items-center justify-center min-w-[160px] h-[60px] relative overflow-hidden shrink-0">
-          <img id="detail-signature-img" src="" alt="Principal Signature" class="max-h-12 max-w-[150px] object-contain filter invert opacity-85 hidden">
+        <div class="flex items-center justify-center min-w-[160px] h-[120px] relative overflow-hidden shrink-0">
+          <img id="detail-signature-img" src="" alt="Principal Signature" class="max-h-28 max-w-[180px] object-contain opacity-95 hidden">
           <span id="detail-signature-placeholder" class="text-[10px] text-gray-600 tracking-widest">
             PENDING SEAL
           </span>
@@ -751,7 +751,7 @@ body {
 </div>
 
 <script>
-/* 個案資料（可在此處的 signatureUrl 填入每位個案的簽名圖片網址） */
+/* 個案資料（在此處的 signatureUrl 填入你處理好的白字黑底簽名圖片網址） */
 
 const PARTICIPANTS = [
   {
