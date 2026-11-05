@@ -1,4 +1,13 @@
+這是我幫你以最新版代碼為基底進行更新的完整 **`index.html`**。
 
+這次的修改重點：
+
+1. **完全移除**原本的 `<audio>` 呼吸音檔監控區塊與相關程式碼。
+2. 在「本體焦慮自白紀錄」下方，新增了符合檔案庫/公文審查體制感的 **「OFFICIAL SIGNATURE / 官方授權簽署紀錄」** 區塊，並支援使用個案的**真實簽名照片**（我在個案資料 `PARTICIPANTS` 中新增了 `signatureUrl` 欄位供你填入簽名圖片網址）。
+
+請直接複製以下完整程式碼覆蓋你的 `index.html` 檔案：
+
+```html
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -612,32 +621,7 @@ body {
 
       </div>
 
-      <div class="bg-gray-950/90 rounded-lg p-5 border border-gray-800 space-y-3 font-mono">
-
-        <div class="flex justify-between items-center text-xs gap-3">
-
-          <span class="text-emerald-400 font-bold flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            PNEUMATIC AUDIO MONITOR (代理呼吸音檔監控)
-          </span>
-
-          <span class="text-[10px] text-gray-500">
-            48kHz / RAW RECORDING
-          </span>
-
-        </div>
-
-        <audio
-          id="breathing-audio"
-          controls
-          class="w-full h-10 rounded opacity-90 hover:opacity-100 transition-opacity"
-        >
-          <source id="audio-source" src="" type="audio/mpeg">
-          您的瀏覽器不支援音訊播放。
-        </audio>
-
-      </div>
-
+      <!-- 本體焦慮自白紀錄 -->
       <div class="bg-gray-950/90 rounded-lg p-6 border border-gray-800/80 relative">
 
         <span class="text-[10px] font-mono text-gray-500 tracking-widest absolute top-3 right-4">
@@ -655,6 +639,25 @@ body {
           "---"
         </blockquote>
 
+      </div>
+
+      <!-- 官方授權與簽名欄（照片簽名） -->
+      <div class="bg-gray-950/90 rounded-lg p-6 border border-gray-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono">
+        <div>
+          <span class="text-[10px] text-emerald-400 tracking-widest block mb-1">
+            OFFICIAL SIGNATURE / 官方授權簽署紀錄
+          </span>
+          <p class="text-[11px] text-gray-500 font-sans">
+            茲證明本檔案已完成代理化程序，本體與裝置之生物權限正式移交。
+          </p>
+        </div>
+
+        <div class="bg-black/60 border border-gray-800 rounded p-2 flex items-center justify-center min-w-[160px] h-[60px] relative overflow-hidden shrink-0">
+          <img id="detail-signature-img" src="" alt="Principal Signature" class="max-h-12 max-w-[150px] object-contain filter invert opacity-85 hidden">
+          <span id="detail-signature-placeholder" class="text-[10px] text-gray-600 tracking-widest">
+            PENDING SEAL
+          </span>
+        </div>
       </div>
 
     </article>
@@ -758,7 +761,7 @@ body {
 </div>
 
 <script>
-/* 個案資料 */
+/* 個案資料（可在此處的 signatureUrl 填入每位個案的簽名圖片網址） */
 
 const PARTICIPANTS = [
   {
@@ -770,7 +773,7 @@ const PARTICIPANTS = [
     birthDate: "2005-02-26",
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-96d3b302-64c7-4d0a-92c3-dae869f734ea.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-10-27-116824ad-2295-48ab-bfc1-92ff1656d47d.jpg",
-    audioUrl: "breath01.mp3",
+    signatureUrl: "", // 在此填入簽名圖片網址
     statement: "我發現自己根本無法忍受純粹的放空。只要一停下來，那種『時間正被浪費』的罪惡感就會把我吞噬。我做這個替身，不是為了讓自己舒服地去休息，而是因為我停不下來——我需要一個實體掛在那裡，替我承擔什麼都不做、只剩下呼吸的死寂。"
   },
   {
@@ -782,7 +785,7 @@ const PARTICIPANTS = [
     birthDate: "2005-07-10",
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-09d06678-a47a-49da-b2bb-c6197ce8a8ea.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-10-25-9afd07b5-083e-4c4d-a816-f5d9519e8f92.jpg",
-    audioUrl: "breath02.mp3",
+    signatureUrl: "", // 在此填入簽名圖片網址
     statement: "只要超過半天沒有打開繪圖軟體或思考進度，我就會產生一種即將被同齡人徹底淘汰的恐慌。明明身體已經累到極限，但大腦還是強迫性地尋找事情做。我需要這台機器幫我把『休息』當成一項公事來認真執行。"
   },
   {
@@ -794,7 +797,7 @@ const PARTICIPANTS = [
     birthDate: "2005-06-09",
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-b70cd799-0bbf-4737-a890-d4c0962fe741.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-10-27-4e230bf1-0d8a-429f-b28d-9e4734ace26d.jpg",
-    audioUrl: "breath03.mp3",
+    signatureUrl: "", // 在此填入簽名圖片網址
     statement: "休假對我來說不是放鬆，而是一場審判。躺在床上滑手機的每一分鐘，都在盤算著自己少做了多少事。如果一定要有人在那裡放空，那就讓這顆塑膠薄膜包覆的人頭替我坐牢吧。"
   },
   {
@@ -806,7 +809,7 @@ const PARTICIPANTS = [
     birthDate: "2005-01-01",
     imageUrl: "",
     deviceImageUrl: "",
-    audioUrl: "breath04.mp3",
+    signatureUrl: "", // 在此填入簽名圖片網址
     statement: "檔案建立中，等待資料輸入..."
   }
 ];
@@ -1066,9 +1069,6 @@ function showPortal() {
   if (breathTimer) {
     clearInterval(breathTimer);
   }
-
-  const audio = document.getElementById('breathing-audio');
-  audio.pause();
 }
 
 function showDetail(id) {
@@ -1100,6 +1100,19 @@ function showDetail(id) {
   principalImg.src = pUrl;
   deviceImg.src = dUrl;
 
+  // 簽名圖片處理
+  const sigImg = document.getElementById('detail-signature-img');
+  const sigPlaceholder = document.getElementById('detail-signature-placeholder');
+  if (data.signatureUrl) {
+    sigImg.src = `${data.signatureUrl}?v=${Date.now()}`;
+    sigImg.classList.remove('hidden');
+    sigPlaceholder.classList.add('hidden');
+  } else {
+    sigImg.src = '';
+    sigImg.classList.add('hidden');
+    sigPlaceholder.classList.remove('hidden');
+  }
+
   document.getElementById('comparison-slider').value = 50;
   document.getElementById('slider-clip-wrapper').style.width = '50%';
   document.getElementById('slider-line').style.left = '50%';
@@ -1109,12 +1122,6 @@ function showDetail(id) {
 
   document.getElementById('badge-device').className =
     "absolute bottom-2.5 right-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive";
-
-  const audio = document.getElementById('breathing-audio');
-  const source = document.getElementById('audio-source');
-
-  source.src = data.audioUrl;
-  audio.load();
 
   startBreathCounter(data.birthDate);
 
@@ -1147,3 +1154,5 @@ window.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
+```
