@@ -795,11 +795,11 @@ const PARTICIPANTS = [
     name: "陳Ｏ騏",
     role: "代理呼吸員 04 號",
     target: "陳Ｏ騏 (本體)",
-    anxiety: "95.0% (準備中)",
-    birthDate: "2005-01-01",
+    anxiety: "20.0%~101.0% ",
+    birthDate: "2005-01-13",
     imageUrl: "",
     deviceImageUrl: "",
-    signatureUrl: "",
+    signatureUrl: "https://cdn.phototourl.com/member/2026-11-12-138664ec-ffa6-434b-9a84-e752704cabef.png",
     statement: "檔案建立中，等待資料輸入..."
   }
 ];
