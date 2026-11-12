@@ -797,8 +797,8 @@ const PARTICIPANTS = [
     target: "陳Ｏ騏 (本體)",
     anxiety: "20.0%~101.0% ",
     birthDate: "2005-01-13",
-    imageUrl: "",
-    deviceImageUrl: "",
+    imageUrl: "https://cdn.phototourl.com/member/2026-11-12-7b3841fa-5cb3-4af4-a31d-fefcb0d22eb6.jpg",
+    deviceImageUrl: "https://cdn.phototourl.com/member/2026-11-12-8b5daa41-c18f-4551-8ce9-0cd83800cb70.jpg",
     signatureUrl: "https://cdn.phototourl.com/member/2026-11-12-138664ec-ffa6-434b-9a84-e752704cabef.png",
     statement: "檔案建立中，等待資料輸入..."
   }
