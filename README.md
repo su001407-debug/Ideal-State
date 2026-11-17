@@ -775,7 +775,7 @@ const PARTICIPANTS = [
     birthDate: "2005-07-10",
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-09d06678-a47a-49da-b2bb-c6197ce8a8ea.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-11-12-7e79f8bf-8331-4a21-bd47-52142a9de442.webp",
-    signatureUrl: "",
+    signatureUrl: "https://cdn.phototourl.com/member/2026-11-17-5d5e831c-b031-4cda-b5ec-45c043ea4136.jpg",
     statement: "只要超過半天沒有打開繪圖軟體或思考進度，我就會產生一種即將被同齡人徹底淘汰的恐慌。明明身體已經累到極限，但大腦還是強迫性地尋找事情做。我需要這台機器幫我把『休息』當成一項公事來認真執行。"
   },
   {
