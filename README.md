@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>理想狀態 - Archive Portal</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
@@ -17,6 +18,7 @@ body {
   font-family: 'JetBrains Mono', 'Noto Sans TC', monospace;
   background-color: #08090a;
   color: #d1d5db;
+  overflow-x: hidden;
 }
 
 .bg-grid-dark {
@@ -174,6 +176,41 @@ body {
   opacity: 1;
 }
 
+/* 手機與桌面一致的輸入框樣式，修正 iOS date 欄位跑版 */
+
+.clinical-input {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  background-color: rgba(3, 7, 18, 0.92);
+  border: 1px solid #1f2937;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #ffffff;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.clinical-input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.25);
+}
+
+input[type="date"].clinical-input {
+  color-scheme: dark;
+  height: 44px;
+}
+
+input[type="date"].clinical-input::-webkit-date-and-time-value {
+  text-align: left;
+}
+
 /* HEADER */
 
 .archive-header-main {
@@ -312,7 +349,7 @@ body {
 
 @media (max-width: 767px) {
   .archive-title {
-    font-size: 64px !important;
+    font-size: 56px !important;
   }
 
   .archive-subtitle {
@@ -326,7 +363,7 @@ body {
 
 <div class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-80 bg-emerald-950/20 blur-[130px] pointer-events-none rounded-full"></div>
 
-<div class="max-w-5xl mx-auto px-4 py-8 md:py-14 relative z-10">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-14 relative z-10">
 
   <!-- HEADER -->
 
@@ -431,7 +468,7 @@ body {
 
     <section class="border-t border-gray-800/80 pt-12 space-y-8">
 
-      <div class="flex justify-between items-end border-b border-gray-800/60 pb-3 gap-4">
+      <div class="flex flex-wrap justify-between items-end border-b border-gray-800/60 pb-3 gap-3">
 
         <div>
           <span class="text-[10px] font-mono text-emerald-400 tracking-widest block mb-1">
@@ -443,7 +480,7 @@ body {
           </h2>
 
           <p class="text-xs text-gray-500">
-            獨立收錄展覽現場觀眾提交之個人焦慮病例與診斷紀錄
+            獨立收錄展覽現場觀眾提交之個人焦慮病例（上傳後 5 分鐘內可於原裝置修改或刪除）
           </p>
         </div>
 
@@ -460,21 +497,21 @@ body {
 
       <!-- 現場觀眾病例登錄表單 -->
 
-      <div id="visitor-case-section" class="glass-card rounded-xl p-6 md:p-8 space-y-6">
+      <div id="visitor-case-section" class="glass-card rounded-xl p-5 sm:p-6 md:p-8 space-y-6 w-full overflow-hidden">
 
         <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-gray-800/80 pb-4 gap-2">
 
-          <div>
+          <div class="min-w-0">
             <span class="text-[10px] font-mono text-emerald-400 tracking-widest block mb-1">
               VISITOR INTAKE TERMINAL / 現場病例登錄
             </span>
 
-            <h3 class="text-base font-bold text-white tracking-wide">
+            <h3 id="form-mode-title" class="text-base sm:text-lg font-bold text-white tracking-wide">
               書寫你的病例檔案
             </h3>
 
-            <p class="text-xs text-gray-500 mt-1">
-              若你也有類似的空閒罪惡感或生產力焦慮經歷，只需填寫焦慮自白即可建立病例（其餘欄位皆可選填）
+            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+              只需填寫焦慮自白即可建立病例（其餘皆可選填）；上傳後 5 分鐘內僅限本機裝置可編輯或刪除
             </p>
           </div>
 
@@ -484,9 +521,9 @@ body {
 
         </div>
 
-        <form id="visitor-case-form" class="space-y-5 font-mono text-xs">
+        <form id="visitor-case-form" class="space-y-5 font-mono text-xs w-full">
 
-          <div>
+          <div class="w-full">
             <label for="visitor-statement" class="block text-[10px] text-emerald-400 font-bold mb-1.5">
               本體焦慮自白紀錄 (ANXIETY STATEMENT) * 必填
             </label>
@@ -495,13 +532,13 @@ body {
               rows="4"
               required
               placeholder="寫下你面對空閒、休息或沒有產出時的真實感受與焦慮自白..."
-              class="w-full bg-gray-950/90 border border-gray-800 focus:border-emerald-500 rounded px-3.5 py-2.5 text-xs font-sans text-white placeholder-gray-600 outline-none transition-colors leading-relaxed"
+              class="clinical-input font-sans leading-relaxed"
             ></textarea>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
 
-            <div>
+            <div class="w-full min-w-0">
               <label for="visitor-name" class="block text-[10px] text-gray-400 mb-1.5">
                 委託人姓名 / 代號 (選填)
               </label>
@@ -509,22 +546,22 @@ body {
                 type="text"
                 id="visitor-name"
                 placeholder="例如：王Ｏ明（留空自動編號）"
-                class="w-full bg-gray-950/90 border border-gray-800 focus:border-emerald-500 rounded px-3.5 py-2.5 text-xs text-white placeholder-gray-600 outline-none transition-colors"
+                class="clinical-input"
               >
             </div>
 
-            <div>
+            <div class="w-full min-w-0">
               <label for="visitor-birth" class="block text-[10px] text-gray-400 mb-1.5">
-                出生日期 (選填，用於計算呼吸數)
+                出生日期 (選填，計算呼吸數)
               </label>
               <input
                 type="date"
                 id="visitor-birth"
-                class="w-full bg-gray-950/90 border border-gray-800 focus:border-emerald-500 rounded px-3.5 py-2.5 text-xs text-white outline-none transition-colors"
+                class="clinical-input"
               >
             </div>
 
-            <div>
+            <div class="w-full min-w-0">
               <label for="visitor-anxiety" class="block text-[10px] text-gray-400 mb-1.5">
                 焦慮指數 (選填)
               </label>
@@ -532,73 +569,107 @@ body {
                 type="text"
                 id="visitor-anxiety"
                 placeholder="例如：89.5% (極高)"
-                class="w-full bg-gray-950/90 border border-gray-800 focus:border-emerald-500 rounded px-3.5 py-2.5 text-xs text-white placeholder-gray-600 outline-none transition-colors"
+                class="clinical-input"
               >
             </div>
 
           </div>
 
-          <!-- 手機照相建檔區（選填） -->
+          <!-- 手機照相與相簿選取建檔區（選填） -->
 
-          <div class="bg-gray-950/70 border border-gray-800/80 rounded-lg p-4 space-y-3">
+          <div class="bg-gray-950/75 border border-gray-800/90 rounded-lg p-4 sm:p-5 space-y-4 w-full">
 
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <span class="block text-[11px] text-gray-200 font-bold">
+                現場本體影像建檔 (選填 CAMERA / PHOTO ALBUM)
+              </span>
+              <span class="block text-[10px] text-gray-500 font-sans leading-relaxed">
+                支援手機現場拍照或從相簿選取照片，系統將自動去背並轉換為與上方四位一致的臨床黑白高對比影像
+              </span>
+            </div>
 
-              <div>
-                <span class="block text-[10px] text-gray-300 font-bold">
-                  現場本體影像拍攝 / 選取照片 (選填 CAMERA CAPTURE)
-                </span>
-                <span class="block text-[10px] text-gray-500 mt-0.5 font-sans">
-                  手機點擊可直接開啟相機自拍建檔，系統將自動轉為黑白臨床掃描影像
-                </span>
-              </div>
+            <!-- 拍照與相簿雙按鈕 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
 
-              <div class="flex items-center gap-2 shrink-0">
+              <label
+                for="visitor-camera-input"
+                class="btn-white w-full py-2.5 px-4 rounded text-xs inline-flex items-center justify-center gap-2 cursor-pointer text-center"
+              >
+                <span>📷</span>
+                <span>現場開啟相機拍照</span>
+              </label>
 
-                <label
-                  for="visitor-camera-input"
-                  class="btn-white px-4 py-2 rounded text-xs inline-flex items-center gap-2 cursor-pointer"
-                >
-                  <span>📷</span>
-                  <span>開啟相機拍照 / 選取照片</span>
-                </label>
+              <label
+                for="visitor-album-input"
+                class="w-full py-2.5 px-4 rounded text-xs inline-flex items-center justify-center gap-2 cursor-pointer text-center bg-gray-900 hover:bg-gray-800 text-white border border-gray-700 font-bold transition-colors"
+              >
+                <span>🖼️</span>
+                <span>從手機相簿選取照片</span>
+              </label>
 
-                <input
-                  type="file"
-                  id="visitor-camera-input"
-                  accept="image/*"
-                  capture="user"
-                  class="hidden"
-                >
+              <input
+                type="file"
+                id="visitor-camera-input"
+                accept="image/*"
+                capture="user"
+                class="hidden"
+              >
 
-                <button
-                  type="button"
-                  id="clear-photo-btn"
-                  onclick="clearCapturedPhoto()"
-                  class="hidden px-3 py-2 rounded border border-gray-700 text-gray-400 hover:text-white text-xs"
-                >
-                  清除照片
-                </button>
-
-              </div>
+              <input
+                type="file"
+                id="visitor-album-input"
+                accept="image/*"
+                class="hidden"
+              >
 
             </div>
 
-            <div id="photo-preview-box" class="hidden pt-2 border-t border-gray-800/80 flex items-center gap-4">
+            <!-- 隱私模糊保護開關 + 清除按鈕 -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-gray-800/70">
+
+              <button
+                type="button"
+                id="privacy-blur-toggle"
+                onclick="togglePrivacyBlur()"
+                class="w-full sm:w-auto px-3.5 py-2 rounded text-xs font-mono inline-flex items-center justify-center gap-2 border transition-all cursor-pointer bg-gray-900/90 text-gray-300 border-gray-700 hover:border-emerald-500/60"
+              >
+                <span id="privacy-blur-indicator" class="w-2 h-2 rounded-full bg-gray-500"></span>
+                <span id="privacy-blur-label">隱私模糊保護：關閉 (點擊模糊化臉部)</span>
+              </button>
+
+              <button
+                type="button"
+                id="clear-photo-btn"
+                onclick="clearCapturedPhoto()"
+                class="hidden w-full sm:w-auto px-3.5 py-2 rounded border border-red-900/60 bg-red-950/20 text-red-400 hover:bg-red-950/40 text-xs text-center"
+              >
+                清除已選照片
+              </button>
+
+            </div>
+
+            <!-- 處理中提示 -->
+            <div id="photo-processing-status" class="hidden text-[11px] text-emerald-400 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>正在進行人像去背與臨床灰階調色處理...</span>
+            </div>
+
+            <!-- 影像即時預覽 -->
+            <div id="photo-preview-box" class="hidden pt-3 border-t border-gray-800/80 flex items-center gap-4">
 
               <img
                 id="photo-preview-img"
                 src=""
                 alt="Captured Preview"
-                class="w-16 h-20 object-cover rounded border border-emerald-500/40 grayscale contrast-125"
+                class="w-16 h-20 object-cover rounded border border-emerald-500/40 bg-black shrink-0"
               >
 
-              <div class="text-[10px] space-y-1">
-                <span class="text-emerald-400 font-bold block">
-                  ✓ 影像已完成臨床掃描壓縮
+              <div class="text-[10px] space-y-1 min-w-0">
+                <span id="photo-preview-badge" class="text-emerald-400 font-bold block">
+                  ✓ 影像已完成去背與臨床灰階處理
                 </span>
-                <span class="text-gray-500 block font-sans">
-                  送出病例後將同步顯示於現場觀眾檔案目錄與診斷視窗
+                <span class="text-gray-500 block font-sans leading-relaxed">
+                  已套用純黑底色與高對比影調；可隨時切換上方「隱私模糊保護」確認遮蔽效果
                 </span>
               </div>
 
@@ -606,25 +677,28 @@ body {
 
           </div>
 
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-1">
+          <!-- 表單送出列 -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 w-full">
 
-            <span id="visitor-form-feedback" class="text-[11px] text-emerald-400 min-h-[16px]"></span>
+            <span id="visitor-form-feedback" class="text-[11px] text-emerald-400 min-h-[16px] leading-relaxed"></span>
 
-            <div class="flex items-center gap-3 shrink-0">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto shrink-0">
 
               <button
                 type="button"
-                onclick="resetVisitorCases()"
-                class="px-4 py-2.5 rounded border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors text-xs"
+                id="cancel-edit-btn"
+                onclick="cancelEditMode()"
+                class="hidden w-full sm:w-auto px-4 py-2.5 rounded border border-gray-700 text-gray-300 hover:text-white transition-colors text-xs text-center"
               >
-                重設觀眾病例
+                取消修改
               </button>
 
               <button
                 type="submit"
-                class="btn-neon px-5 py-2.5 rounded text-xs inline-flex items-center gap-2 cursor-pointer"
+                id="submit-case-btn"
+                class="btn-neon w-full sm:w-auto px-5 py-2.5 rounded text-xs inline-flex items-center justify-center gap-2 cursor-pointer text-center"
               >
-                <span>建立並加入觀眾病例</span>
+                <span id="submit-case-btn-text">建立並加入觀眾病例</span>
                 <span>→</span>
               </button>
 
@@ -644,15 +718,44 @@ body {
 
   <main id="detail-view" class="hidden space-y-6">
 
-    <button
-      onclick="showPortal()"
-      class="inline-flex items-center space-x-2 text-xs text-gray-300 hover:text-white transition-colors bg-gray-900/90 hover:bg-gray-800 px-4 py-2 rounded border border-gray-700"
-    >
-      <span>←</span>
-      <span>返回檔案目錄 (RETURN TO DIRECTORY)</span>
-    </button>
+    <div class="flex flex-wrap items-center justify-between gap-3">
 
-    <article class="glass-card rounded-xl p-6 md:p-10 relative space-y-6">
+      <button
+        onclick="showPortal()"
+        class="inline-flex items-center space-x-2 text-xs text-gray-300 hover:text-white transition-colors bg-gray-900/90 hover:bg-gray-800 px-4 py-2 rounded border border-gray-700"
+      >
+        <span>←</span>
+        <span>返回檔案目錄 (RETURN TO DIRECTORY)</span>
+      </button>
+
+      <!-- 詳情頁專屬：本機裝置 5 分鐘內可修改／刪除控制列 -->
+      <div id="detail-owner-controls" class="hidden flex flex-wrap items-center gap-2 font-mono text-xs">
+
+        <span id="detail-edit-countdown" class="text-[11px] text-emerald-400 bg-emerald-950/30 border border-emerald-500/30 px-2.5 py-1.5 rounded">
+          可編輯剩餘 05:00
+        </span>
+
+        <button
+          type="button"
+          id="detail-edit-btn"
+          class="px-3.5 py-1.5 rounded bg-white text-black font-bold hover:bg-gray-200 transition-colors cursor-pointer"
+        >
+          ✎ 修改病例
+        </button>
+
+        <button
+          type="button"
+          id="detail-delete-btn"
+          class="px-3.5 py-1.5 rounded bg-red-950/60 text-red-400 border border-red-800/70 hover:bg-red-900/60 font-bold transition-colors cursor-pointer"
+        >
+          ✕ 刪除病例
+        </button>
+
+      </div>
+
+    </div>
+
+    <article class="glass-card rounded-xl p-5 sm:p-6 md:p-10 relative space-y-6">
 
       <div class="border-b border-gray-800 pb-2 space-y-1">
 
@@ -870,7 +973,7 @@ body {
 
       </div>
 
-      <!-- 官方授權與簽名欄（背景與區塊融為一體，透明融合） -->
+      <!-- 官方授權與簽名欄 -->
       <div class="bg-gray-950/90 rounded-lg p-6 border border-gray-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono">
         <div>
           <span class="text-[10px] text-emerald-400 tracking-widest block mb-1">
@@ -1044,7 +1147,32 @@ const BASE_PARTICIPANTS = [
 ];
 
 const VISITOR_STORAGE_KEY = "IDEAL_STATE_VISITOR_CASES_2026";
-let capturedPhotoDataUrl = "";
+const DEVICE_TOKEN_KEY = "IDEAL_STATE_DEVICE_TOKEN_2026";
+const EDIT_WINDOW_MS = 5 * 60 * 1000; // 5 分鐘可編輯/刪除視窗
+
+/* 取得本機裝置唯一識別碼（確保每人只能修改/刪除自己裝置新增的資料） */
+function getDeviceToken() {
+  try {
+    let token = localStorage.getItem(DEVICE_TOKEN_KEY);
+    if (!token) {
+      token = "DEV-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem(DEVICE_TOKEN_KEY, token);
+    }
+    return token;
+  } catch (err) {
+    return "DEV-SESSION-TEMP";
+  }
+}
+
+const CURRENT_DEVICE_TOKEN = getDeviceToken();
+
+/* 影像狀態變數 */
+let rawCutoutBaseDataUrl = "";   // 去背＋灰階臨床調色後的原始清晰版本
+let capturedPhotoDataUrl = "";   // 最終輸出版本（含是否模糊化）
+let isPrivacyBlurEnabled = false;
+let editingCaseId = null;
+let currentDetailCaseId = null;
+
 let VISITOR_PARTICIPANTS = loadVisitorCases();
 let breathTimer = null;
 
@@ -1077,20 +1205,47 @@ function getAllParticipants() {
   return [...BASE_PARTICIPANTS, ...VISITOR_PARTICIPANTS];
 }
 
-/* 更新觀眾案件總數與下一組編號預覽 */
+/* 檢查該病例是否屬於本機裝置且在 5 分鐘有效編輯期內 */
+function canEditOrDeleteCase(caseItem) {
+  if (!caseItem || !caseItem.ownerToken || !caseItem.createdAt) return false;
+  if (caseItem.ownerToken !== CURRENT_DEVICE_TOKEN) return false;
+  const elapsed = Date.now() - Number(caseItem.createdAt);
+  return elapsed >= 0 && elapsed < EDIT_WINDOW_MS;
+}
 
+function getRemainingEditSeconds(caseItem) {
+  if (!canEditOrDeleteCase(caseItem)) return 0;
+  const remainingMs = EDIT_WINDOW_MS - (Date.now() - Number(caseItem.createdAt));
+  return Math.max(0, Math.ceil(remainingMs / 1000));
+}
+
+function formatSecondsMMSS(sec) {
+  const m = String(Math.floor(sec / 60)).padStart(2, '0');
+  const s = String(sec % 60).padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+/* 更新觀眾案件總數與下一組編號預覽 */
 function updateCaseCountersUI() {
   const visitorTotalEl = document.getElementById('visitor-total-label');
   const nextIdEl = document.getElementById('next-case-preview');
   const visitorCountStr = String(VISITOR_PARTICIPANTS.length).padStart(2, '0');
-  const nextIdStr = String(BASE_PARTICIPANTS.length + VISITOR_PARTICIPANTS.length + 1).padStart(2, '0');
 
   if (visitorTotalEl) {
     visitorTotalEl.innerText = `VISITOR CASES: ${visitorCountStr}`;
   }
 
   if (nextIdEl) {
-    nextIdEl.innerText = `NEXT ID: CASE #${nextIdStr}`;
+    if (editingCaseId) {
+      nextIdEl.innerText = `EDITING: CASE #${editingCaseId}`;
+    } else {
+      const maxNum = VISITOR_PARTICIPANTS.reduce((max, item) => {
+        const n = parseInt(item.id, 10);
+        return !isNaN(n) && n > max ? n : max;
+      }, BASE_PARTICIPANTS.length);
+      const nextIdStr = String(maxNum + 1).padStart(2, '0');
+      nextIdEl.innerText = `NEXT ID: CASE #${nextIdStr}`;
+    }
   }
 }
 
@@ -1238,9 +1393,11 @@ function initComparisonSlider() {
 
 /* 單張卡片模板 */
 
-function buildCaseCardHTML(p) {
+function buildCaseCardHTML(p, isVisitor = false) {
   const imgSrc = formatImageSrc(p.imageUrl);
   const deviceImgSrc = formatImageSrc(p.deviceImageUrl || p.imageUrl);
+  const editable = isVisitor && canEditOrDeleteCase(p);
+  const remainSec = editable ? getRemainingEditSeconds(p) : 0;
 
   return `
     <div
@@ -1250,13 +1407,50 @@ function buildCaseCardHTML(p) {
 
       <div class="aspect-[3/4] w-full bg-gray-950 relative overflow-hidden flex items-center justify-center">
 
-        <div class="absolute top-3 left-3 pointer-events-none z-30">
+        <div class="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none z-30">
 
           <span class="text-xs font-mono text-white tracking-wider font-bold bg-black/70 backdrop-blur-md px-2.5 py-1 rounded shadow-lg inline-block transition-all duration-300 group-hover:bg-transparent group-hover:backdrop-blur-none group-hover:shadow-none mobile-auto-bg-fade">
             CASE #${p.id}
           </span>
 
+          ${
+            editable
+              ? `
+                <div class="flex items-center gap-1.5 pointer-events-auto" onclick="event.stopPropagation()">
+                  <button
+                    type="button"
+                    onclick="startEditVisitorCase('${p.id}')"
+                    title="5 分鐘內可修改"
+                    class="px-2 py-1 rounded bg-white/95 text-black font-mono text-[10px] font-bold hover:bg-emerald-400 transition-colors shadow"
+                  >
+                    ✎ 修改
+                  </button>
+                  <button
+                    type="button"
+                    onclick="deleteVisitorCase('${p.id}')"
+                    title="5 分鐘內可刪除"
+                    class="px-2 py-1 rounded bg-red-950/90 text-red-400 border border-red-700/70 font-mono text-[10px] font-bold hover:bg-red-800 hover:text-white transition-colors shadow"
+                  >
+                    ✕
+                  </button>
+                </div>
+              `
+              : ''
+          }
+
         </div>
+
+        ${
+          editable
+            ? `
+              <div class="absolute top-11 left-3 pointer-events-none z-30">
+                <span data-countdown-id="${p.id}" class="text-[9px] font-mono text-emerald-400 bg-black/80 border border-emerald-500/30 px-2 py-0.5 rounded">
+                  可編輯 ${formatSecondsMMSS(remainSec)}
+                </span>
+              </div>
+            `
+            : ''
+        }
 
         ${
           p.imageUrl
@@ -1302,11 +1496,11 @@ function buildCaseCardHTML(p) {
 
         <div class="absolute bottom-14 left-4 right-4 space-y-0.5 pointer-events-none z-30">
 
-          <h3 class="text-lg font-bold text-white tracking-wide">
+          <h3 class="text-lg font-bold text-white tracking-wide truncate">
             ${p.name}
           </h3>
 
-          <p class="text-xs text-gray-300 font-mono">
+          <p class="text-xs text-gray-300 font-mono truncate">
             ${p.role}
           </p>
 
@@ -1334,7 +1528,7 @@ function renderPortalCards() {
   const visitorContainer = document.getElementById('visitor-cards-container');
 
   if (baseContainer) {
-    baseContainer.innerHTML = BASE_PARTICIPANTS.map(buildCaseCardHTML).join('');
+    baseContainer.innerHTML = BASE_PARTICIPANTS.map(p => buildCaseCardHTML(p, false)).join('');
   }
 
   if (visitorContainer) {
@@ -1350,83 +1544,439 @@ function renderPortalCards() {
         </div>
       `;
     } else {
-      visitorContainer.innerHTML = VISITOR_PARTICIPANTS.map(buildCaseCardHTML).join('');
+      visitorContainer.innerHTML = VISITOR_PARTICIPANTS.map(p => buildCaseCardHTML(p, true)).join('');
     }
   }
 
   updateCaseCountersUI();
 }
 
-/* 手機照相與影像壓縮處理 */
+/* 人像去背 + 臨床灰階高對比調色引擎 */
 
-function compressCapturedImage(file, callback) {
-  const reader = new FileReader();
-  reader.onload = function(event) {
+let selfieSegmenterInstance = null;
+
+function getSelfieSegmenter() {
+  if (selfieSegmenterInstance) return selfieSegmenterInstance;
+  if (typeof SelfieSegmentation === "undefined") return null;
+
+  try {
+    const segmenter = new SelfieSegmentation({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
+    });
+    segmenter.setOptions({
+      modelSelection: 1,
+      selfieMode: false
+    });
+    selfieSegmenterInstance = segmenter;
+    return segmenter;
+  } catch (e) {
+    return null;
+  }
+}
+
+/* 套用與上方四張一致的黑白高對比臨床色調 */
+function applyClinicalMonochromeTone(ctx, width, height) {
+  const imgData = ctx.getImageData(0, 0, width, height);
+  const data = imgData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+
+    // 灰階加權計算
+    let lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+    // 高對比 S 曲線與暗部壓沉，模擬上方四件雕塑的臨床攝影質感
+    let normalized = lum / 255;
+    normalized = (normalized - 0.5) * 1.28 + 0.48;
+    normalized = Math.max(0, Math.min(1, normalized));
+    const finalGray = Math.round(normalized * 255);
+
+    data[i] = finalGray;
+    data[i + 1] = finalGray;
+    data[i + 2] = finalGray;
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+}
+
+/* 兜底去背（若外部模型無法載入時，依四角背景色容差＋暗角漸層移除背景） */
+function fallbackBackgroundCutout(img, width, height) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, width, height);
+
+  const imgData = ctx.getImageData(0, 0, width, height);
+  const data = imgData.data;
+
+  // 取左上、右上角落像素作為背景基準色
+  const corners = [
+    0,
+    (width - 1) * 4,
+    (Math.floor(height * 0.15) * width) * 4,
+    (Math.floor(height * 0.15) * width + width - 1) * 4
+  ];
+
+  let bgR = 0, bgG = 0, bgB = 0;
+  corners.forEach(idx => {
+    bgR += data[idx];
+    bgG += data[idx + 1];
+    bgB += data[idx + 2];
+  });
+  bgR /= corners.length;
+  bgG /= corners.length;
+  bgB /= corners.length;
+
+  const cx = width * 0.5;
+  const cy = height * 0.46;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4;
+      const dr = data[idx] - bgR;
+      const dg = data[idx + 1] - bgG;
+      const db = data[idx + 2] - bgB;
+      const colorDist = Math.sqrt(dr * dr + dg * dg + db * db);
+
+      const nx = (x - cx) / (width * 0.44);
+      const ny = (y - cy) / (height * 0.52);
+      const radialDist = Math.sqrt(nx * nx + ny * ny);
+
+      if (colorDist < 42 && radialDist > 0.62) {
+        data[idx] = 8;
+        data[idx + 1] = 9;
+        data[idx + 2] = 10;
+      } else if (radialDist > 0.92) {
+        const fade = Math.max(0, 1 - (radialDist - 0.92) * 3.5);
+        data[idx] = Math.round(data[idx] * fade + 8 * (1 - fade));
+        data[idx + 1] = Math.round(data[idx + 1] * fade + 9 * (1 - fade));
+        data[idx + 2] = Math.round(data[idx + 2] * fade + 10 * (1 - fade));
+      }
+    }
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+  applyClinicalMonochromeTone(ctx, width, height);
+  return canvas.toDataURL('image/jpeg', 0.82);
+}
+
+/* 執行去背與臨床調色 */
+function processPortraitCutoutAndTone(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const img = new Image();
+      img.onload = async function() {
+        const maxDim = 680;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const segmenter = getSelfieSegmenter();
+        if (!segmenter) {
+          resolve(fallbackBackgroundCutout(img, width, height));
+          return;
+        }
+
+        let resolved = false;
+        const timeoutId = setTimeout(() => {
+          if (!resolved) {
+            resolved = true;
+            resolve(fallbackBackgroundCutout(img, width, height));
+          }
+        }, 4500);
+
+        try {
+          segmenter.onResults((results) => {
+            if (resolved) return;
+            resolved = true;
+            clearTimeout(timeoutId);
+
+            // 1. 先繪製去背遮罩，保留人像本體
+            const fgCanvas = document.createElement('canvas');
+            fgCanvas.width = width;
+            fgCanvas.height = height;
+            const fgCtx = fgCanvas.getContext('2d');
+
+            fgCtx.drawImage(results.segmentationMask, 0, 0, width, height);
+            fgCtx.globalCompositeOperation = 'source-in';
+            fgCtx.drawImage(results.image, 0, 0, width, height);
+
+            // 2. 合成到與作品一致的深黑臨床背景 (#08090a)
+            const outCanvas = document.createElement('canvas');
+            outCanvas.width = width;
+            outCanvas.height = height;
+            const outCtx = outCanvas.getContext('2d');
+
+            outCtx.fillStyle = '#08090a';
+            outCtx.fillRect(0, 0, width, height);
+            outCtx.drawImage(fgCanvas, 0, 0, width, height);
+
+            // 3. 套用臨床高對比黑白影調
+            applyClinicalMonochromeTone(outCtx, width, height);
+
+            resolve(outCanvas.toDataURL('image/jpeg', 0.82));
+          });
+
+          const inputCanvas = document.createElement('canvas');
+          inputCanvas.width = width;
+          inputCanvas.height = height;
+          inputCanvas.getContext('2d').drawImage(img, 0, 0, width, height);
+          await segmenter.send({ image: inputCanvas });
+        } catch (err) {
+          if (!resolved) {
+            resolved = true;
+            clearTimeout(timeoutId);
+            resolve(fallbackBackgroundCutout(img, width, height));
+          }
+        }
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* 根據「隱私模糊保護」開關即時生成最終圖片 */
+function rebuildOutputPhotoWithPrivacyOption() {
+  return new Promise((resolve) => {
+    if (!rawCutoutBaseDataUrl) {
+      capturedPhotoDataUrl = "";
+      resolve("");
+      return;
+    }
+
+    if (!isPrivacyBlurEnabled) {
+      capturedPhotoDataUrl = rawCutoutBaseDataUrl;
+      updatePhotoPreviewUI();
+      resolve(capturedPhotoDataUrl);
+      return;
+    }
+
     const img = new Image();
     img.onload = function() {
-      const maxDim = 720;
-      let width = img.width;
-      let height = img.height;
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
 
-      if (width > maxDim || height > maxDim) {
-        if (width > height) {
-          height = Math.round((height * maxDim) / width);
-          width = maxDim;
-        } else {
-          width = Math.round((width * maxDim) / height);
-          height = maxDim;
-        }
+      ctx.fillStyle = '#08090a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 烘焙高斯模糊保護臉部特徵（支援所有手機瀏覽器，含無 ctx.filter 的舊版 Safari）
+      if (typeof ctx.filter !== 'undefined') {
+        ctx.filter = 'blur(14px)';
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.filter = 'none';
+      } else {
+        // 降採樣＋放大法實現跨瀏覽器不可逆像素模糊
+        const smallW = Math.max(18, Math.round(canvas.width * 0.06));
+        const smallH = Math.max(24, Math.round(canvas.height * 0.06));
+        const tmpCanvas = document.createElement('canvas');
+        tmpCanvas.width = smallW;
+        tmpCanvas.height = smallH;
+        const tmpCtx = tmpCanvas.getContext('2d');
+        tmpCtx.drawImage(img, 0, 0, smallW, smallH);
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(tmpCanvas, 0, 0, smallW, smallH, 0, 0, canvas.width, canvas.height);
       }
 
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
-
-      const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.78);
-      callback(compressedDataUrl);
+      capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      updatePhotoPreviewUI();
+      resolve(capturedPhotoDataUrl);
     };
-    img.src = event.target.result;
-  };
-  reader.readAsDataURL(file);
+    img.src = rawCutoutBaseDataUrl;
+  });
+}
+
+function updatePhotoPreviewUI() {
+  const previewBox = document.getElementById('photo-preview-box');
+  const previewImg = document.getElementById('photo-preview-img');
+  const previewBadge = document.getElementById('photo-preview-badge');
+  const clearBtn = document.getElementById('clear-photo-btn');
+
+  if (!capturedPhotoDataUrl) {
+    if (previewBox) previewBox.classList.add('hidden');
+    if (clearBtn) clearBtn.classList.add('hidden');
+    return;
+  }
+
+  if (previewImg) previewImg.src = capturedPhotoDataUrl;
+  if (previewBox) previewBox.classList.remove('hidden');
+  if (clearBtn) clearBtn.classList.remove('hidden');
+
+  if (previewBadge) {
+    previewBadge.innerText = isPrivacyBlurEnabled
+      ? "✓ 影像已完成去背＋臨床灰階＋隱私模糊加密"
+      : "✓ 影像已完成自動去背與臨床灰階調色";
+  }
+}
+
+/* 切換隱私模糊保護按鈕 */
+async function togglePrivacyBlur() {
+  isPrivacyBlurEnabled = !isPrivacyBlurEnabled;
+
+  const btn = document.getElementById('privacy-blur-toggle');
+  const indicator = document.getElementById('privacy-blur-indicator');
+  const label = document.getElementById('privacy-blur-label');
+
+  if (isPrivacyBlurEnabled) {
+    btn.className = "w-full sm:w-auto px-3.5 py-2 rounded text-xs font-mono inline-flex items-center justify-center gap-2 border transition-all cursor-pointer bg-emerald-950/50 text-emerald-400 border-emerald-500/60";
+    indicator.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+    label.innerText = "隱私模糊保護：已開啟 (臉部已模糊化)";
+  } else {
+    btn.className = "w-full sm:w-auto px-3.5 py-2 rounded text-xs font-mono inline-flex items-center justify-center gap-2 border transition-all cursor-pointer bg-gray-900/90 text-gray-300 border-gray-700 hover:border-emerald-500/60";
+    indicator.className = "w-2 h-2 rounded-full bg-gray-500";
+    label.innerText = "隱私模糊保護：關閉 (點擊模糊化臉部)";
+  }
+
+  if (rawCutoutBaseDataUrl) {
+    await rebuildOutputPhotoWithPrivacyOption();
+  }
 }
 
 function clearCapturedPhoto() {
+  rawCutoutBaseDataUrl = "";
   capturedPhotoDataUrl = "";
   const cameraInput = document.getElementById('visitor-camera-input');
+  const albumInput = document.getElementById('visitor-album-input');
   const previewBox = document.getElementById('photo-preview-box');
   const previewImg = document.getElementById('photo-preview-img');
   const clearBtn = document.getElementById('clear-photo-btn');
 
   if (cameraInput) cameraInput.value = "";
+  if (albumInput) albumInput.value = "";
   if (previewImg) previewImg.src = "";
   if (previewBox) previewBox.classList.add('hidden');
   if (clearBtn) clearBtn.classList.add('hidden');
 }
 
-/* 現場觀眾病例登錄處理 */
+async function handleSelectedImageFile(file) {
+  if (!file) return;
+  const statusEl = document.getElementById('photo-processing-status');
+  if (statusEl) statusEl.classList.remove('hidden');
+
+  rawCutoutBaseDataUrl = await processPortraitCutoutAndTone(file);
+  await rebuildOutputPhotoWithPrivacyOption();
+
+  if (statusEl) statusEl.classList.add('hidden');
+}
+
+/* 開始編輯本機裝置 5 分鐘內的病例 */
+function startEditVisitorCase(id) {
+  const target = VISITOR_PARTICIPANTS.find(p => p.id === id);
+  if (!target || !canEditOrDeleteCase(target)) {
+    alert("此病例已超過 5 分鐘修改時限，或非本機裝置建立之檔案。");
+    renderPortalCards();
+    return;
+  }
+
+  editingCaseId = id;
+  showPortal();
+
+  document.getElementById('visitor-statement').value = target.statement || "";
+  document.getElementById('visitor-name').value = target.name || "";
+  document.getElementById('visitor-birth').value = target.birthDate || "";
+  document.getElementById('visitor-anxiety').value = target.anxiety || "";
+
+  if (target.rawImageUrl || target.imageUrl) {
+    rawCutoutBaseDataUrl = target.rawImageUrl || target.imageUrl;
+    capturedPhotoDataUrl = target.imageUrl;
+    updatePhotoPreviewUI();
+  } else {
+    clearCapturedPhoto();
+  }
+
+  document.getElementById('form-mode-title').innerText = `修改病例檔案：CASE #${id}`;
+  document.getElementById('submit-case-btn-text').innerText = "儲存病例修改";
+  document.getElementById('cancel-edit-btn').classList.remove('hidden');
+  document.getElementById('visitor-form-feedback').innerText = `正在編輯 CASE #${id}（僅限建立後 5 分鐘內修改）`;
+
+  updateCaseCountersUI();
+
+  const formSection = document.getElementById('visitor-case-section');
+  if (formSection) {
+    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function cancelEditMode() {
+  editingCaseId = null;
+  const form = document.getElementById('visitor-case-form');
+  if (form) form.reset();
+  clearCapturedPhoto();
+
+  document.getElementById('form-mode-title').innerText = "書寫你的病例檔案";
+  document.getElementById('submit-case-btn-text').innerText = "建立並加入觀眾病例";
+  document.getElementById('cancel-edit-btn').classList.add('hidden');
+  document.getElementById('visitor-form-feedback').innerText = "";
+  updateCaseCountersUI();
+}
+
+/* 刪除本機裝置 5 分鐘內的病例 */
+function deleteVisitorCase(id) {
+  const target = VISITOR_PARTICIPANTS.find(p => p.id === id);
+  if (!target || !canEditOrDeleteCase(target)) {
+    alert("此病例已超過 5 分鐘刪除時限，或非本機裝置建立之檔案。");
+    renderPortalCards();
+    return;
+  }
+
+  if (!confirm(`確定要刪除病例 CASE #${id}（${target.name}）嗎？`)) {
+    return;
+  }
+
+  VISITOR_PARTICIPANTS = VISITOR_PARTICIPANTS.filter(p => p.id !== id);
+  saveVisitorCases(VISITOR_PARTICIPANTS);
+
+  if (editingCaseId === id) {
+    cancelEditMode();
+  }
+
+  renderPortalCards();
+
+  if (currentDetailCaseId === id) {
+    showPortal();
+  }
+
+  const feedback = document.getElementById('visitor-form-feedback');
+  if (feedback) {
+    feedback.innerText = `已刪除病例 CASE #${id}。`;
+  }
+}
+
+/* 現場觀眾病例登錄與更新處理 */
 
 function initVisitorForm() {
   const form = document.getElementById('visitor-case-form');
   const feedback = document.getElementById('visitor-form-feedback');
   const cameraInput = document.getElementById('visitor-camera-input');
+  const albumInput = document.getElementById('visitor-album-input');
 
   if (cameraInput) {
     cameraInput.addEventListener('change', function(e) {
       const file = e.target.files && e.target.files[0];
-      if (!file) return;
+      handleSelectedImageFile(file);
+    });
+  }
 
-      compressCapturedImage(file, function(dataUrl) {
-        capturedPhotoDataUrl = dataUrl;
-        const previewBox = document.getElementById('photo-preview-box');
-        const previewImg = document.getElementById('photo-preview-img');
-        const clearBtn = document.getElementById('clear-photo-btn');
-
-        if (previewImg) previewImg.src = dataUrl;
-        if (previewBox) previewBox.classList.remove('hidden');
-        if (clearBtn) clearBtn.classList.remove('hidden');
-      });
+  if (albumInput) {
+    albumInput.addEventListener('change', function(e) {
+      const file = e.target.files && e.target.files[0];
+      handleSelectedImageFile(file);
     });
   }
 
@@ -1445,7 +1995,47 @@ function initVisitorForm() {
       return;
     }
 
-    const nextNum = BASE_PARTICIPANTS.length + VISITOR_PARTICIPANTS.length + 1;
+    // 若處於 5 分鐘內的修改模式
+    if (editingCaseId) {
+      const idx = VISITOR_PARTICIPANTS.findIndex(p => p.id === editingCaseId);
+      if (idx === -1 || !canEditOrDeleteCase(VISITOR_PARTICIPANTS[idx])) {
+        feedback.textContent = "已超過 5 分鐘可修改時限，無法儲存變更。";
+        cancelEditMode();
+        renderPortalCards();
+        return;
+      }
+
+      const existing = VISITOR_PARTICIPANTS[idx];
+      const resolvedName = nameInput || existing.name;
+      const resolvedBirth = birthInput || existing.birthDate || "2005-01-01";
+
+      VISITOR_PARTICIPANTS[idx] = {
+        ...existing,
+        name: resolvedName,
+        target: `${resolvedName} (本體)`,
+        anxiety: anxietyInput || existing.anxiety,
+        birthDate: resolvedBirth,
+        rawImageUrl: rawCutoutBaseDataUrl,
+        imageUrl: capturedPhotoDataUrl,
+        deviceImageUrl: capturedPhotoDataUrl,
+        statement: statementInput
+      };
+
+      saveVisitorCases(VISITOR_PARTICIPANTS);
+      const updatedId = existing.id;
+      cancelEditMode();
+      renderPortalCards();
+      feedback.textContent = `已更新病例 CASE #${updatedId}（${resolvedName}）。`;
+      return;
+    }
+
+    // 新增病例模式
+    const maxNum = VISITOR_PARTICIPANTS.reduce((max, item) => {
+      const n = parseInt(item.id, 10);
+      return !isNaN(n) && n > max ? n : max;
+    }, BASE_PARTICIPANTS.length);
+
+    const nextNum = maxNum + 1;
     const nextId = String(nextNum).padStart(2, '0');
     const resolvedName = nameInput || `現場委託人 #${nextId}`;
     const resolvedBirth = birthInput || "2005-01-01";
@@ -1457,10 +2047,13 @@ function initVisitorForm() {
       target: `${resolvedName} (本體)`,
       anxiety: anxietyInput || "85.0% (現場登錄)",
       birthDate: resolvedBirth,
+      rawImageUrl: rawCutoutBaseDataUrl,
       imageUrl: capturedPhotoDataUrl,
       deviceImageUrl: capturedPhotoDataUrl,
       signatureUrl: "",
-      statement: statementInput
+      statement: statementInput,
+      ownerToken: CURRENT_DEVICE_TOKEN,
+      createdAt: Date.now()
     };
 
     VISITOR_PARTICIPANTS = [...VISITOR_PARTICIPANTS, newCase];
@@ -1469,23 +2062,46 @@ function initVisitorForm() {
     renderPortalCards();
     form.reset();
     clearCapturedPhoto();
-    feedback.textContent = `已建立病例 CASE #${nextId}（${resolvedName}），並加入「現場觀眾病例檔案目錄」。`;
+    feedback.textContent = `已建立病例 CASE #${nextId}（${resolvedName}），5 分鐘內可於本裝置修改或刪除。`;
   });
 }
 
-function resetVisitorCases() {
-  VISITOR_PARTICIPANTS = [];
-  saveVisitorCases([]);
-  renderPortalCards();
-  const feedback = document.getElementById('visitor-form-feedback');
-  if (feedback) {
-    feedback.textContent = "已重設現場觀眾病例檔案。";
-  }
+/* 定期檢查 5 分鐘編輯時限倒數並自動鎖定過期項目 */
+function startEditWindowTicker() {
+  setInterval(() => {
+    let anyExpiredJustNow = false;
+
+    document.querySelectorAll('[data-countdown-id]').forEach(el => {
+      const cid = el.getAttribute('data-countdown-id');
+      const item = VISITOR_PARTICIPANTS.find(p => p.id === cid);
+      const remain = getRemainingEditSeconds(item);
+      if (remain <= 0) {
+        anyExpiredJustNow = true;
+      } else {
+        el.innerText = `可編輯 ${formatSecondsMMSS(remain)}`;
+      }
+    });
+
+    if (anyExpiredJustNow) {
+      if (editingCaseId) {
+        const editingItem = VISITOR_PARTICIPANTS.find(p => p.id === editingCaseId);
+        if (!canEditOrDeleteCase(editingItem)) {
+          cancelEditMode();
+        }
+      }
+      renderPortalCards();
+    }
+
+    if (currentDetailCaseId) {
+      updateDetailOwnerControls(currentDetailCaseId);
+    }
+  }, 1000);
 }
 
 /* 頁面切換 */
 
 function showPortal() {
+  currentDetailCaseId = null;
   document.getElementById('portal-view').classList.remove('hidden');
   document.getElementById('detail-view').classList.add('hidden');
 
@@ -1496,11 +2112,32 @@ function showPortal() {
   }
 }
 
+function updateDetailOwnerControls(id) {
+  const controlsEl = document.getElementById('detail-owner-controls');
+  const countdownEl = document.getElementById('detail-edit-countdown');
+  const editBtn = document.getElementById('detail-edit-btn');
+  const deleteBtn = document.getElementById('detail-delete-btn');
+
+  const visitorItem = VISITOR_PARTICIPANTS.find(p => p.id === id);
+  if (visitorItem && canEditOrDeleteCase(visitorItem)) {
+    const remain = getRemainingEditSeconds(visitorItem);
+    controlsEl.classList.remove('hidden');
+    countdownEl.innerText = `可編輯剩餘 ${formatSecondsMMSS(remain)}`;
+    editBtn.onclick = () => startEditVisitorCase(id);
+    deleteBtn.onclick = () => deleteVisitorCase(id);
+  } else {
+    controlsEl.classList.add('hidden');
+  }
+}
+
 function showDetail(id) {
   const allCases = getAllParticipants();
   const data = allCases.find(p => p.id === id) || BASE_PARTICIPANTS[0];
+  currentDetailCaseId = data.id;
 
   document.getElementById('header-output-box').style.display = 'none';
+
+  updateDetailOwnerControls(data.id);
 
   document.getElementById('detail-id').innerText = `CASE #${data.id}`;
   document.getElementById('detail-name').innerText = data.name;
@@ -1582,6 +2219,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initComparisonSlider();
   startOutputFluctuationWithPause();
   initVisitorForm();
+  startEditWindowTicker();
 
   const urlParams = new URLSearchParams(window.location.search);
   const targetId = urlParams.get('id');
