@@ -176,8 +176,6 @@ body {
   opacity: 1;
 }
 
-/* 手機與桌面一致的輸入框樣式，修正 iOS date 欄位跑版 */
-
 .clinical-input {
   display: block;
   width: 100%;
@@ -210,8 +208,6 @@ input[type="date"].clinical-input {
 input[type="date"].clinical-input::-webkit-date-and-time-value {
   text-align: left;
 }
-
-/* HEADER */
 
 .archive-header-main {
   display: flex;
@@ -289,8 +285,6 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
   padding: 8px 16px;
   white-space: nowrap;
 }
-
-/* 關閉視窗：電腦與手機都水平置中 */
 
 .concept-modal-footer {
   display: flex !important;
@@ -480,7 +474,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
           </h2>
 
           <p class="text-xs text-gray-500">
-            獨立收錄展覽現場觀眾提交之個人焦慮病例（上傳後 5 分鐘內可於原裝置修改或刪除）
+            跨裝置同步收錄觀眾提交之個人焦慮病例（上傳後 5 分鐘內可於原裝置修改或刪除）
           </p>
         </div>
 
@@ -492,7 +486,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
       <div
         id="visitor-cards-container"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6"
       ></div>
 
       <!-- 現場觀眾病例登錄表單 -->
@@ -511,7 +505,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
             </h3>
 
             <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-              只需填寫焦慮自白即可建立病例（其餘皆可選填）；上傳後 5 分鐘內僅限本機裝置可編輯或刪除
+              只需填寫焦慮自白即可建立病例（其餘皆可選填）；上傳後 5 分鐘內僅限原上傳裝置可編輯或刪除
             </p>
           </div>
 
@@ -584,11 +578,10 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
                 現場本體影像拍攝 / 選取照片 (選填 CAMERA / PHOTO)
               </span>
               <span class="block text-[10px] text-gray-500 font-sans leading-relaxed">
-                點擊下方按鈕可拍照或從相簿選取照片，系統將自動去背、將頭髮轉為銀白色並保留清楚五官層次
+                點擊下方按鈕可拍照或從相簿選取照片，系統將自動去背並套用黑白灰階與微調曝光
               </span>
             </div>
 
-            <!-- 單一按鈕 -->
             <div class="w-full">
 
               <label
@@ -608,7 +601,6 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
             </div>
 
-            <!-- 隱私模糊保護開關 + 清除按鈕 -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-gray-800/70">
 
               <button
@@ -632,13 +624,11 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
             </div>
 
-            <!-- 處理中提示 -->
             <div id="photo-processing-status" class="hidden text-[11px] text-emerald-400 flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span>正在進行人像去背、白髮轉換與五官對比調色處理...</span>
+              <span>正在進行人像去背、黑白灰階與曝光微調處理...</span>
             </div>
 
-            <!-- 影像即時預覽 -->
             <div id="photo-preview-box" class="hidden pt-3 border-t border-gray-800/80 flex items-center gap-4">
 
               <img
@@ -650,10 +640,10 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
               <div class="text-[10px] space-y-1 min-w-0">
                 <span id="photo-preview-badge" class="text-emerald-400 font-bold block">
-                  ✓ 影像已完成去背、白髮銀白化與五官層次調色
+                  ✓ 影像已完成去背與黑白曝光調整
                 </span>
                 <span class="text-gray-500 block font-sans leading-relaxed">
-                  已套用純黑底色與細膩黑白顆粒影調；可隨時切換上方「隱私模糊保護」確認遮蔽效果
+                  已套用純黑底色與自然黑白灰階；可隨時切換上方「隱私模糊保護」確認遮蔽效果
                 </span>
               </div>
 
@@ -661,7 +651,6 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
           </div>
 
-          <!-- 表單送出列 -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 w-full">
 
             <span id="visitor-form-feedback" class="text-[11px] text-emerald-400 min-h-[16px] leading-relaxed"></span>
@@ -712,7 +701,6 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
         <span>返回檔案目錄 (RETURN TO DIRECTORY)</span>
       </button>
 
-      <!-- 詳情頁專屬：本機裝置 5 分鐘內可修改／刪除控制列 -->
       <div id="detail-owner-controls" class="hidden flex flex-wrap items-center gap-2 font-mono text-xs">
 
         <span id="detail-edit-countdown" class="text-[11px] text-emerald-400 bg-emerald-950/30 border border-emerald-500/30 px-2.5 py-1.5 rounded">
@@ -937,7 +925,6 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
       </div>
 
-      <!-- 本體焦慮自白紀錄 -->
       <div class="bg-gray-950/90 rounded-lg p-6 border border-gray-800/80 relative">
 
         <span class="text-[10px] font-mono text-gray-500 tracking-widest absolute top-3 right-4">
@@ -957,7 +944,6 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
       </div>
 
-      <!-- 官方授權與簽名欄 -->
       <div class="bg-gray-950/90 rounded-lg p-6 border border-gray-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono">
         <div>
           <span class="text-[10px] text-emerald-400 tracking-widest block mb-1">
@@ -1041,8 +1027,6 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
       </div>
 
-      <!-- 電腦與手機均置中 -->
-
       <div
         class="concept-modal-footer border-t border-gray-800/60 pt-4"
         style="display:flex !important;justify-content:center !important;align-items:center !important;width:100% !important;"
@@ -1077,8 +1061,11 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 </div>
 
 <script>
-/* 原始四位個案資料 */
+/* Firebase Realtime Database 跨裝置即時同步設定 */
+const FIREBASE_DB_URL = "https://ideal-state-default-rtdb.asia-southeast1.firebasedatabase.app";
+const FIREBASE_CASES_ENDPOINT = `${FIREBASE_DB_URL}/visitor_cases.json`;
 
+/* 原始四位個案資料 */
 const BASE_PARTICIPANTS = [
   {
     id: "01",
@@ -1134,7 +1121,14 @@ const VISITOR_STORAGE_KEY = "IDEAL_STATE_VISITOR_CASES_2026";
 const DEVICE_TOKEN_KEY = "IDEAL_STATE_DEVICE_TOKEN_2026";
 const EDIT_WINDOW_MS = 5 * 60 * 1000; // 5 分鐘可編輯/刪除視窗
 
-/* 取得本機裝置唯一識別碼（確保每人只能修改/刪除自己裝置新增的資料） */
+function hasFirebaseConfigured() {
+  return Boolean(
+    FIREBASE_DB_URL &&
+    FIREBASE_DB_URL.startsWith("https://")
+  );
+}
+
+/* 取得本機裝置唯一識別碼（確保只有原上傳裝置能在 5 分鐘內修改或刪除） */
 function getDeviceToken() {
   try {
     let token = localStorage.getItem(DEVICE_TOKEN_KEY);
@@ -1151,13 +1145,14 @@ function getDeviceToken() {
 const CURRENT_DEVICE_TOKEN = getDeviceToken();
 
 /* 影像狀態變數 */
-let rawCutoutBaseDataUrl = "";   // 去背＋白髮銀白化＋保留五官層次的清晰版本
-let capturedPhotoDataUrl = "";   // 最終輸出版本（含是否模糊化）
+let rawCutoutBaseDataUrl = "";
+let capturedPhotoDataUrl = "";
 let isPrivacyBlurEnabled = false;
 let editingCaseId = null;
 let currentDetailCaseId = null;
+let lastRenderedSignature = "";
 
-let VISITOR_PARTICIPANTS = loadVisitorCases();
+let VISITOR_PARTICIPANTS = loadLocalVisitorCases();
 let breathTimer = null;
 
 function formatImageSrc(url) {
@@ -1166,7 +1161,7 @@ function formatImageSrc(url) {
   return `${url}?v=${Date.now()}`;
 }
 
-function loadVisitorCases() {
+function loadLocalVisitorCases() {
   try {
     const raw = localStorage.getItem(VISITOR_STORAGE_KEY);
     if (!raw) return [];
@@ -1177,11 +1172,67 @@ function loadVisitorCases() {
   }
 }
 
-function saveVisitorCases(cases) {
+function saveLocalVisitorCases(cases) {
   try {
     localStorage.setItem(VISITOR_STORAGE_KEY, JSON.stringify(cases));
   } catch (err) {
-    // 忽略儲存空間限制錯誤
+    // 忽略本機快取空間限制
+  }
+}
+
+/* 從 Firebase 雲端讀取所有觀眾病例 */
+async function fetchCloudVisitorCases() {
+  if (!hasFirebaseConfigured()) {
+    return loadLocalVisitorCases();
+  }
+
+  try {
+    const res = await fetch(`${FIREBASE_CASES_ENDPOINT}?t=${Date.now()}`, {
+      cache: "no-store"
+    });
+    if (!res.ok) throw new Error("Firebase fetch failed");
+    const data = await res.json();
+
+    if (!data) return [];
+
+    let list = [];
+    if (Array.isArray(data)) {
+      list = data.filter(Boolean);
+    } else if (typeof data === "object") {
+      list = Object.values(data).filter(Boolean);
+    }
+
+    list.sort((a, b) => {
+      const na = parseInt(a.id, 10) || 0;
+      const nb = parseInt(b.id, 10) || 0;
+      return na - nb;
+    });
+
+    return list;
+  } catch (err) {
+    return loadLocalVisitorCases();
+  }
+}
+
+/* 將所有觀眾病例同步寫入 Firebase 雲端 */
+async function syncVisitorCasesToCloud(cases) {
+  saveLocalVisitorCases(cases);
+
+  if (!hasFirebaseConfigured()) {
+    return { ok: false, reason: "NOT_CONFIGURED" };
+  }
+
+  try {
+    const payload = cases.length === 0 ? null : cases;
+    const res = await fetch(FIREBASE_CASES_ENDPOINT, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error("Firebase PUT failed");
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, reason: "NETWORK_ERROR" };
   }
 }
 
@@ -1189,7 +1240,6 @@ function getAllParticipants() {
   return [...BASE_PARTICIPANTS, ...VISITOR_PARTICIPANTS];
 }
 
-/* 檢查該病例是否屬於本機裝置且在 5 分鐘有效編輯期內 */
 function canEditOrDeleteCase(caseItem) {
   if (!caseItem || !caseItem.ownerToken || !caseItem.createdAt) return false;
   if (caseItem.ownerToken !== CURRENT_DEVICE_TOKEN) return false;
@@ -1209,7 +1259,6 @@ function formatSecondsMMSS(sec) {
   return `${m}:${s}`;
 }
 
-/* 更新觀眾案件總數與下一組編號預覽 */
 function updateCaseCountersUI() {
   const visitorTotalEl = document.getElementById('visitor-total-label');
   const nextIdEl = document.getElementById('next-case-preview');
@@ -1234,7 +1283,6 @@ function updateCaseCountersUI() {
 }
 
 /* 作品理念 */
-
 function openConceptModal() {
   const modal = document.getElementById('concept-modal');
   modal.classList.remove('hidden-modal');
@@ -1254,7 +1302,6 @@ document.getElementById('concept-modal').addEventListener('click', function(e) {
 });
 
 /* 產出數值 */
-
 function startOutputFluctuationWithPause() {
   const headerOutputEl = document.getElementById('header-output-counter');
   const detailOutputEl = document.getElementById('detail-output-counter');
@@ -1301,13 +1348,10 @@ function startOutputFluctuationWithPause() {
 }
 
 /* 呼吸計數 */
-
 function calculateLifetimeBreaths(birthDateStr) {
   const birthDate = new Date(birthDateStr);
   const now = new Date();
-
   const diffInSeconds = (now - birthDate) / 1000;
-
   return Math.max(0, Math.floor(diffInSeconds * 0.25));
 }
 
@@ -1317,9 +1361,7 @@ function startBreathCounter(birthDateStr) {
   }
 
   let currentBreaths = calculateLifetimeBreaths(birthDateStr);
-
   const counterEl = document.getElementById('detail-breath-counter');
-
   counterEl.innerText = currentBreaths.toLocaleString();
 
   breathTimer = setInterval(() => {
@@ -1329,7 +1371,6 @@ function startBreathCounter(birthDateStr) {
 }
 
 /* 圖片對比 */
-
 function updateImgDimensions() {
   const sliderContainer = document.getElementById('detail-slider-container');
   const principalImg = document.getElementById('detail-principal-img');
@@ -1371,12 +1412,10 @@ function initComparisonSlider() {
   });
 
   window.addEventListener('resize', updateImgDimensions);
-
   updateImgDimensions();
 }
 
 /* 單張卡片模板 */
-
 function buildCaseCardHTML(p, isVisitor = false) {
   const imgSrc = formatImageSrc(p.imageUrl);
   const deviceImgSrc = formatImageSrc(p.deviceImageUrl || p.imageUrl);
@@ -1391,21 +1430,21 @@ function buildCaseCardHTML(p, isVisitor = false) {
 
       <div class="aspect-[3/4] w-full bg-gray-950 relative overflow-hidden flex items-center justify-center">
 
-        <div class="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none z-30">
+        <div class="absolute top-2.5 left-2.5 right-2.5 sm:top-3 sm:left-3 sm:right-3 flex items-center justify-between gap-1.5 pointer-events-none z-30">
 
-          <span class="text-xs font-mono text-white tracking-wider font-bold bg-black/70 backdrop-blur-md px-2.5 py-1 rounded shadow-lg inline-block transition-all duration-300 group-hover:bg-transparent group-hover:backdrop-blur-none group-hover:shadow-none mobile-auto-bg-fade">
+          <span class="text-[10px] sm:text-xs font-mono text-white tracking-wider font-bold bg-black/70 backdrop-blur-md px-2 sm:px-2.5 py-0.5 sm:py-1 rounded shadow-lg inline-block transition-all duration-300 group-hover:bg-transparent group-hover:backdrop-blur-none group-hover:shadow-none mobile-auto-bg-fade">
             CASE #${p.id}
           </span>
 
           ${
             editable
               ? `
-                <div class="flex items-center gap-1.5 pointer-events-auto" onclick="event.stopPropagation()">
+                <div class="flex items-center gap-1 pointer-events-auto" onclick="event.stopPropagation()">
                   <button
                     type="button"
                     onclick="startEditVisitorCase('${p.id}')"
                     title="5 分鐘內可修改"
-                    class="px-2 py-1 rounded bg-white/95 text-black font-mono text-[10px] font-bold hover:bg-emerald-400 transition-colors shadow"
+                    class="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded bg-white/95 text-black font-mono text-[9px] sm:text-[10px] font-bold hover:bg-emerald-400 transition-colors shadow"
                   >
                     ✎ 修改
                   </button>
@@ -1413,7 +1452,7 @@ function buildCaseCardHTML(p, isVisitor = false) {
                     type="button"
                     onclick="deleteVisitorCase('${p.id}')"
                     title="5 分鐘內可刪除"
-                    class="px-2 py-1 rounded bg-red-950/90 text-red-400 border border-red-700/70 font-mono text-[10px] font-bold hover:bg-red-800 hover:text-white transition-colors shadow"
+                    class="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded bg-red-950/90 text-red-400 border border-red-700/70 font-mono text-[9px] sm:text-[10px] font-bold hover:bg-red-800 hover:text-white transition-colors shadow"
                   >
                     ✕
                   </button>
@@ -1427,8 +1466,8 @@ function buildCaseCardHTML(p, isVisitor = false) {
         ${
           editable
             ? `
-              <div class="absolute top-11 left-3 pointer-events-none z-30">
-                <span data-countdown-id="${p.id}" class="text-[9px] font-mono text-emerald-400 bg-black/80 border border-emerald-500/30 px-2 py-0.5 rounded">
+              <div class="absolute top-9 sm:top-11 left-2.5 sm:left-3 pointer-events-none z-30">
+                <span data-countdown-id="${p.id}" class="text-[8px] sm:text-[9px] font-mono text-emerald-400 bg-black/80 border border-emerald-500/30 px-1.5 sm:px-2 py-0.5 rounded">
                   可編輯 ${formatSecondsMMSS(remainSec)}
                 </span>
               </div>
@@ -1455,7 +1494,7 @@ function buildCaseCardHTML(p, isVisitor = false) {
               <div class="flex flex-col items-center space-y-2 text-gray-700">
 
                 <svg
-                  class="w-12 h-12 stroke-gray-700"
+                  class="w-10 h-10 sm:w-12 sm:h-12 stroke-gray-700"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -1478,21 +1517,21 @@ function buildCaseCardHTML(p, isVisitor = false) {
 
         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none z-20"></div>
 
-        <div class="absolute bottom-14 left-4 right-4 space-y-0.5 pointer-events-none z-30">
+        <div class="absolute bottom-12 sm:bottom-14 left-3 right-3 sm:left-4 sm:right-4 space-y-0.5 pointer-events-none z-30">
 
-          <h3 class="text-lg font-bold text-white tracking-wide truncate">
+          <h3 class="text-sm sm:text-lg font-bold text-white tracking-wide truncate">
             ${p.name}
           </h3>
 
-          <p class="text-xs text-gray-300 font-mono truncate">
+          <p class="text-[10px] sm:text-xs text-gray-300 font-mono truncate">
             ${p.role}
           </p>
 
         </div>
 
-        <div class="absolute bottom-3 left-3 right-3 z-30">
+        <div class="absolute bottom-2.5 left-2.5 right-2.5 sm:bottom-3 sm:left-3 sm:right-3 z-30">
 
-          <button class="btn-neon w-full py-2 text-xs rounded shadow-lg flex items-center justify-center space-x-1">
+          <button class="btn-neon w-full py-1.5 sm:py-2 text-[10px] sm:text-xs rounded shadow-lg flex items-center justify-center space-x-1">
             <span>檢視個案診斷</span>
             <span>→</span>
           </button>
@@ -1506,8 +1545,14 @@ function buildCaseCardHTML(p, isVisitor = false) {
 }
 
 /* 渲染原始四位卡片與現場觀眾獨立卡片 */
+function renderPortalCards(force = false) {
+  const sig = VISITOR_PARTICIPANTS.map(p => `${p.id}|${p.name}|${p.statement}|${Boolean(p.imageUrl)}`).join("||");
+  if (!force && sig === lastRenderedSignature) {
+    updateCaseCountersUI();
+    return;
+  }
+  lastRenderedSignature = sig;
 
-function renderPortalCards() {
   const baseContainer = document.getElementById('cards-container');
   const visitorContainer = document.getElementById('visitor-cards-container');
 
@@ -1523,7 +1568,7 @@ function renderPortalCards() {
             [STANDBY] 尚未收錄現場觀眾病例檔案
           </span>
           <span class="text-[11px] text-gray-600 font-sans block">
-            請於下方「書寫你的病例檔案」登錄你的焦慮自白，建立後將顯示於此獨立檔案區
+            請於下方「書寫你的病例檔案」登錄你的焦慮自白，建立後將跨裝置同步顯示於此
           </span>
         </div>
       `;
@@ -1535,8 +1580,7 @@ function renderPortalCards() {
   updateCaseCountersUI();
 }
 
-/* 人像去背 + 頭髮銀白化 + 清晰五官層次調色引擎 */
-
+/* 人像去背 + 一般黑白灰階 + 適度曝光微調 */
 let selfieSegmenterInstance = null;
 
 function getSelfieSegmenter() {
@@ -1558,122 +1602,44 @@ function getSelfieSegmenter() {
   }
 }
 
-/* 去背純黑底 + 頭髮銀白化 + 清楚保留五官明暗層次與細膩顆粒 */
 function applyClinicalMonochromeTone(ctx, width, height, alphaMaskData = null) {
   const imgData = ctx.getImageData(0, 0, width, height);
   const data = imgData.data;
 
-  let yMin = height;
-  let yMax = 0;
-  let xMin = width;
-  let xMax = 0;
+  const exposureGain = 1.18;
+  const contrastFactor = 1.08;
 
-  if (alphaMaskData) {
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const a = alphaMaskData[(y * width + x) * 4 + 3];
-        if (a > 30) {
-          if (y < yMin) yMin = y;
-          if (y > yMax) yMax = y;
-          if (x < xMin) xMin = x;
-          if (x > xMax) xMax = x;
-        }
-      }
+  for (let i = 0; i < data.length; i += 4) {
+    const fgAlpha = alphaMaskData ? alphaMaskData[i + 3] / 255 : 1;
+
+    if (fgAlpha < 0.08) {
+      data[i] = 8;
+      data[i + 1] = 9;
+      data[i + 2] = 10;
+      continue;
     }
-  }
 
-  if (yMin >= yMax) {
-    yMin = Math.round(height * 0.08);
-    yMax = Math.round(height * 0.96);
-    xMin = Math.round(width * 0.16);
-    xMax = Math.round(width * 0.84);
-  }
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
 
-  const fgHeight = Math.max(1, yMax - yMin);
-  const fgWidth = Math.max(1, xMax - xMin);
-  const faceCenterX = (xMin + xMax) * 0.5;
-  const eyesCenterY = yMin + fgHeight * 0.42;
+    let lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    lum = lum * exposureGain;
+    lum = (lum - 0.5) * contrastFactor + 0.5;
+    lum = Math.max(0, Math.min(1, lum));
 
-  let seed = 1337;
-  function nextGrain() {
-    seed = (seed * 16807) % 2147483647;
-    return ((seed - 1) / 2147483646) - 0.5;
-  }
+    const edgeBlend = Math.min(1, Math.max(0, (fgAlpha - 0.08) / 0.55));
+    const finalLum = lum * edgeBlend + (8 / 255) * (1 - edgeBlend);
 
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const idx = (y * width + x) * 4;
-      const fgAlpha = alphaMaskData ? alphaMaskData[idx + 3] / 255 : 1;
-
-      const r = data[idx];
-      const g = data[idx + 1];
-      const b = data[idx + 2];
-
-      // 原始灰階亮度 (0~1)
-      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-      // 背景維持深邃黑底與微弱顆粒
-      if (fgAlpha < 0.08) {
-        const bgVal = Math.max(4, Math.min(20, Math.round((0.032 + nextGrain() * 0.025) * 255)));
-        data[idx] = bgVal;
-        data[idx + 1] = bgVal;
-        data[idx + 2] = bgVal;
-        continue;
-      }
-
-      const relY = (y - yMin) / fgHeight;
-      const dxNorm = (x - faceCenterX) / (fgWidth * 0.25);
-      const dyNorm = (y - eyesCenterY) / (fgHeight * 0.20);
-      const coreFaceDist = Math.sqrt(dxNorm * dxNorm + dyNorm * dyNorm);
-
-      // 頭髮區域權重
-      let hairRegionWeight = 0;
-      if (relY < 0.35) {
-        hairRegionWeight = 1.0;
-      } else if (relY < 0.72) {
-        hairRegionWeight = Math.min(1, Math.max(0, (coreFaceDist - 0.85) * 1.6));
-      } else {
-        hairRegionWeight = Math.min(1, Math.max(0, (Math.abs(x - faceCenterX) / (fgWidth * 0.26) - 0.75) * 1.5));
-      }
-
-      // 暗部髮絲銀白化係數
-      const darkness = Math.max(0, 1 - lum * 2.2);
-      const silverHairFactor = hairRegionWeight * darkness;
-
-      // 適度對比與中明度保留，避免五官過曝死白
-      let faceTone = Math.pow(lum, 0.85) * 0.96 + 0.03;
-      faceTone = (faceTone - 0.48) * 1.25 + 0.48;
-      faceTone = Math.max(0.04, Math.min(0.92, faceTone));
-
-      let mapped;
-      if (silverHairFactor > 0.05) {
-        // 頭髮呈銀白色（約 0.58 ~ 0.90），同時保留髮絲紋理起伏
-        const strandTexture = Math.pow(lum / 0.5, 0.75) * 0.22;
-        const silverTone = 0.60 + strandTexture + (1 - lum) * 0.12;
-        mapped = faceTone * (1 - silverHairFactor) + silverTone * silverHairFactor;
-      } else {
-        mapped = faceTone;
-      }
-
-      // 前景邊緣平滑過渡到黑底
-      const edgeBlend = Math.min(1, Math.max(0, (fgAlpha - 0.08) / 0.55));
-      mapped = mapped * edgeBlend + 0.032 * (1 - edgeBlend);
-
-      // 加入細膩底片顆粒噪點
-      mapped = mapped + nextGrain() * 0.05;
-      mapped = Math.max(0, Math.min(1, mapped));
-
-      const val = Math.round(mapped * 255);
-      data[idx] = val;
-      data[idx + 1] = val;
-      data[idx + 2] = val;
-    }
+    const val = Math.round(finalLum * 255);
+    data[i] = val;
+    data[i + 1] = val;
+    data[i + 2] = val;
   }
 
   ctx.putImageData(imgData, 0, 0);
 }
 
-/* 兜底去背（若外部模型無法載入時，依四角背景色容差＋暗角漸層建立前景遮罩） */
 function fallbackBackgroundCutout(img, width, height) {
   const canvas = document.createElement('canvas');
   canvas.width = width;
@@ -1738,17 +1704,16 @@ function fallbackBackgroundCutout(img, width, height) {
   }
 
   applyClinicalMonochromeTone(ctx, width, height, mData);
-  return canvas.toDataURL('image/jpeg', 0.86);
+  return canvas.toDataURL('image/jpeg', 0.82);
 }
 
-/* 執行去背、頭髮銀白化與五官層次調色 */
 function processPortraitCutoutAndTone(file) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = function(event) {
       const img = new Image();
       img.onload = async function() {
-        const maxDim = 720;
+        const maxDim = 640;
         let width = img.width;
         let height = img.height;
 
@@ -1797,7 +1762,7 @@ function processPortraitCutoutAndTone(file) {
 
             applyClinicalMonochromeTone(outCtx, width, height, alphaMaskData);
 
-            resolve(outCanvas.toDataURL('image/jpeg', 0.86));
+            resolve(outCanvas.toDataURL('image/jpeg', 0.82));
           });
 
           const inputCanvas = document.createElement('canvas');
@@ -1819,7 +1784,6 @@ function processPortraitCutoutAndTone(file) {
   });
 }
 
-/* 根據「隱私模糊保護」開關即時生成最終圖片 */
 function rebuildOutputPhotoWithPrivacyOption() {
   return new Promise((resolve) => {
     if (!rawCutoutBaseDataUrl) {
@@ -1862,7 +1826,7 @@ function rebuildOutputPhotoWithPrivacyOption() {
         ctx.drawImage(tmpCanvas, 0, 0, smallW, smallH, 0, 0, canvas.width, canvas.height);
       }
 
-      capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.80);
       updatePhotoPreviewUI();
       resolve(capturedPhotoDataUrl);
     };
@@ -1888,12 +1852,11 @@ function updatePhotoPreviewUI() {
 
   if (previewBadge) {
     previewBadge.innerText = isPrivacyBlurEnabled
-      ? "✓ 影像已完成去背＋白髮銀白化＋隱私模糊加密"
-      : "✓ 影像已完成去背、白髮銀白化與五官層次調色";
+      ? "✓ 影像已完成去背＋黑白曝光＋隱私模糊加密"
+      : "✓ 影像已完成去背與黑白曝光調整";
   }
 }
 
-/* 切換隱私模糊保護按鈕 */
 async function togglePrivacyBlur() {
   isPrivacyBlurEnabled = !isPrivacyBlurEnabled;
 
@@ -1941,12 +1904,11 @@ async function handleSelectedImageFile(file) {
   if (statusEl) statusEl.classList.add('hidden');
 }
 
-/* 開始編輯本機裝置 5 分鐘內的病例 */
 function startEditVisitorCase(id) {
   const target = VISITOR_PARTICIPANTS.find(p => p.id === id);
   if (!target || !canEditOrDeleteCase(target)) {
-    alert("此病例已超過 5 分鐘修改時限，或非本機裝置建立之檔案。");
-    renderPortalCards();
+    alert("此病例已超過 5 分鐘修改時限，或非原上傳裝置建立之檔案。");
+    renderPortalCards(true);
     return;
   }
 
@@ -1992,12 +1954,11 @@ function cancelEditMode() {
   updateCaseCountersUI();
 }
 
-/* 刪除本機裝置 5 分鐘內的病例 */
-function deleteVisitorCase(id) {
+async function deleteVisitorCase(id) {
   const target = VISITOR_PARTICIPANTS.find(p => p.id === id);
   if (!target || !canEditOrDeleteCase(target)) {
-    alert("此病例已超過 5 分鐘刪除時限，或非本機裝置建立之檔案。");
-    renderPortalCards();
+    alert("此病例已超過 5 分鐘刪除時限，或非原上傳裝置建立之檔案。");
+    renderPortalCards(true);
     return;
   }
 
@@ -2006,13 +1967,13 @@ function deleteVisitorCase(id) {
   }
 
   VISITOR_PARTICIPANTS = VISITOR_PARTICIPANTS.filter(p => p.id !== id);
-  saveVisitorCases(VISITOR_PARTICIPANTS);
+  const syncResult = await syncVisitorCasesToCloud(VISITOR_PARTICIPANTS);
 
   if (editingCaseId === id) {
     cancelEditMode();
   }
 
-  renderPortalCards();
+  renderPortalCards(true);
 
   if (currentDetailCaseId === id) {
     showPortal();
@@ -2020,12 +1981,13 @@ function deleteVisitorCase(id) {
 
   const feedback = document.getElementById('visitor-form-feedback');
   if (feedback) {
-    feedback.innerText = `已刪除病例 CASE #${id}。`;
+    feedback.innerText = syncResult.ok
+      ? `已從雲端刪除病例 CASE #${id}（全裝置已同步）。`
+      : `已刪除病例 CASE #${id}（雲端連線異常，已於本機更新）。`;
   }
 }
 
 /* 現場觀眾病例登錄與更新處理 */
-
 function initVisitorForm() {
   const form = document.getElementById('visitor-case-form');
   const feedback = document.getElementById('visitor-form-feedback');
@@ -2040,7 +2002,7 @@ function initVisitorForm() {
 
   if (!form) return;
 
-  form.addEventListener('submit', function(e) {
+  form.addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const statementInput = document.getElementById('visitor-statement').value.trim();
@@ -2053,12 +2015,14 @@ function initVisitorForm() {
       return;
     }
 
+    feedback.textContent = "正在同步至雲端資料庫...";
+
     if (editingCaseId) {
       const idx = VISITOR_PARTICIPANTS.findIndex(p => p.id === editingCaseId);
       if (idx === -1 || !canEditOrDeleteCase(VISITOR_PARTICIPANTS[idx])) {
         feedback.textContent = "已超過 5 分鐘可修改時限，無法儲存變更。";
         cancelEditMode();
-        renderPortalCards();
+        renderPortalCards(true);
         return;
       }
 
@@ -2078,12 +2042,19 @@ function initVisitorForm() {
         statement: statementInput
       };
 
-      saveVisitorCases(VISITOR_PARTICIPANTS);
+      const syncResult = await syncVisitorCasesToCloud(VISITOR_PARTICIPANTS);
       const updatedId = existing.id;
       cancelEditMode();
-      renderPortalCards();
-      feedback.textContent = `已更新病例 CASE #${updatedId}（${resolvedName}）。`;
+      renderPortalCards(true);
+      feedback.textContent = syncResult.ok
+        ? `已更新病例 CASE #${updatedId}（${resolvedName}）並同步至所有裝置。`
+        : `已更新病例 CASE #${updatedId}（雲端連線異常，已暫存於本機）。`;
       return;
+    }
+
+    const latestCloud = await fetchCloudVisitorCases();
+    if (latestCloud.length > 0) {
+      VISITOR_PARTICIPANTS = latestCloud;
     }
 
     const maxNum = VISITOR_PARTICIPANTS.reduce((max, item) => {
@@ -2113,16 +2084,37 @@ function initVisitorForm() {
     };
 
     VISITOR_PARTICIPANTS = [...VISITOR_PARTICIPANTS, newCase];
-    saveVisitorCases(VISITOR_PARTICIPANTS);
+    const syncResult = await syncVisitorCasesToCloud(VISITOR_PARTICIPANTS);
 
-    renderPortalCards();
+    renderPortalCards(true);
     form.reset();
     clearCapturedPhoto();
-    feedback.textContent = `已建立病例 CASE #${nextId}（${resolvedName}），5 分鐘內可於本裝置修改或刪除。`;
+
+    if (syncResult.ok) {
+      feedback.textContent = `已建立病例 CASE #${nextId}（${resolvedName}）並同步至雲端，5 分鐘內可於本裝置修改或刪除。`;
+    } else {
+      feedback.textContent = `已建立病例 CASE #${nextId}（${resolvedName}），雲端連線異常，請確認 Firebase 測試規則權限。`;
+    }
   });
 }
 
-/* 定期檢查 5 分鐘編輯時限倒數並自動鎖定過期項目 */
+/* 定期從雲端同步最新病例（每 3 秒一次） */
+function startCloudSyncPolling() {
+  if (!hasFirebaseConfigured()) return;
+
+  setInterval(async () => {
+    if (editingCaseId) return;
+    const cloudCases = await fetchCloudVisitorCases();
+    const nextSig = cloudCases.map(p => `${p.id}|${p.name}|${p.statement}|${Boolean(p.imageUrl)}`).join("||");
+    if (nextSig !== lastRenderedSignature) {
+      VISITOR_PARTICIPANTS = cloudCases;
+      saveLocalVisitorCases(cloudCases);
+      renderPortalCards(true);
+    }
+  }, 3000);
+}
+
+/* 定期檢查 5 分鐘編輯時限倒數 */
 function startEditWindowTicker() {
   setInterval(() => {
     let anyExpiredJustNow = false;
@@ -2145,7 +2137,7 @@ function startEditWindowTicker() {
           cancelEditMode();
         }
       }
-      renderPortalCards();
+      renderPortalCards(true);
     }
 
     if (currentDetailCaseId) {
@@ -2155,12 +2147,10 @@ function startEditWindowTicker() {
 }
 
 /* 頁面切換 */
-
 function showPortal() {
   currentDetailCaseId = null;
   document.getElementById('portal-view').classList.remove('hidden');
   document.getElementById('detail-view').classList.add('hidden');
-
   document.getElementById('header-output-box').style.display = '';
 
   if (breathTimer) {
@@ -2192,7 +2182,6 @@ function showDetail(id) {
   currentDetailCaseId = data.id;
 
   document.getElementById('header-output-box').style.display = 'none';
-
   updateDetailOwnerControls(data.id);
 
   document.getElementById('detail-id').innerText = `CASE #${data.id}`;
@@ -2232,7 +2221,6 @@ function showDetail(id) {
     if (noImgFallback) noImgFallback.classList.remove('hidden');
   }
 
-  // 簽名圖片處理
   const sigImg = document.getElementById('detail-signature-img');
   const sigPlaceholder = document.getElementById('detail-signature-placeholder');
   if (data.signatureUrl) {
@@ -2269,13 +2257,20 @@ function showDetail(id) {
 }
 
 /* 初始化 */
-
-window.addEventListener('DOMContentLoaded', () => {
-  renderPortalCards();
+window.addEventListener('DOMContentLoaded', async () => {
+  renderPortalCards(true);
   initComparisonSlider();
   startOutputFluctuationWithPause();
   initVisitorForm();
   startEditWindowTicker();
+
+  if (hasFirebaseConfigured()) {
+    const cloudCases = await fetchCloudVisitorCases();
+    VISITOR_PARTICIPANTS = cloudCases;
+    saveLocalVisitorCases(cloudCases);
+    renderPortalCards(true);
+    startCloudSyncPolling();
+  }
 
   const urlParams = new URLSearchParams(window.location.search);
   const targetId = urlParams.get('id');
@@ -2287,4 +2282,4 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 
 </body>
-</html>ㄏ
+</html>
