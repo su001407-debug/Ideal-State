@@ -474,7 +474,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
           </h2>
 
           <p class="text-xs text-gray-500">
-            跨裝置同步收錄觀眾提交之個人焦慮病例（上傳後 5 分鐘內可於原裝置修改或刪除）
+            跨裝置同步收錄觀眾提交之個人焦慮病例（上傳後 3 分鐘內可於原裝置修改或刪除）
           </p>
         </div>
 
@@ -505,7 +505,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
             </h3>
 
             <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-              只需填寫焦慮自白即可建立病例（其餘皆可選填）；上傳後 5 分鐘內僅限原上傳裝置可編輯或刪除
+              只需填寫焦慮自白即可建立病例（其餘皆可選填）；上傳後 3 分鐘內僅限原上傳裝置可編輯或刪除
             </p>
           </div>
 
@@ -704,7 +704,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
       <div id="detail-owner-controls" class="hidden flex flex-wrap items-center gap-2 font-mono text-xs">
 
         <span id="detail-edit-countdown" class="text-[11px] text-emerald-400 bg-emerald-950/30 border border-emerald-500/30 px-2.5 py-1.5 rounded">
-          可編輯剩餘 05:00
+          可編輯剩餘 03:00
         </span>
 
         <button
@@ -1119,7 +1119,7 @@ const BASE_PARTICIPANTS = [
 
 const VISITOR_STORAGE_KEY = "IDEAL_STATE_VISITOR_CASES_2026";
 const DEVICE_TOKEN_KEY = "IDEAL_STATE_DEVICE_TOKEN_2026";
-const EDIT_WINDOW_MS = 5 * 60 * 1000; // 5 分鐘可編輯/刪除視窗
+const EDIT_WINDOW_MS = 3 * 60 * 1000; // 3 分鐘可編輯/刪除視窗
 
 function hasFirebaseConfigured() {
   return Boolean(
@@ -1128,7 +1128,7 @@ function hasFirebaseConfigured() {
   );
 }
 
-/* 取得本機裝置唯一識別碼（確保只有原上傳裝置能在 5 分鐘內修改或刪除） */
+/* 取得本機裝置唯一識別碼（確保只有原上傳裝置能在 3 分鐘內修改或刪除） */
 function getDeviceToken() {
   try {
     let token = localStorage.getItem(DEVICE_TOKEN_KEY);
@@ -1415,12 +1415,11 @@ function initComparisonSlider() {
   updateImgDimensions();
 }
 
-/* 單張卡片模板 */
+/* 單張卡片模板（左上僅留 CASE 編號；修改/刪除置於檢視按鈕上方、左右對齊、各佔一半） */
 function buildCaseCardHTML(p, isVisitor = false) {
   const imgSrc = formatImageSrc(p.imageUrl);
   const deviceImgSrc = formatImageSrc(p.deviceImageUrl || p.imageUrl);
   const editable = isVisitor && canEditOrDeleteCase(p);
-  const remainSec = editable ? getRemainingEditSeconds(p) : 0;
 
   return `
     <div
@@ -1430,50 +1429,11 @@ function buildCaseCardHTML(p, isVisitor = false) {
 
       <div class="aspect-[3/4] w-full bg-gray-950 relative overflow-hidden flex items-center justify-center">
 
-        <div class="absolute top-2.5 left-2.5 right-2.5 sm:top-3 sm:left-3 sm:right-3 flex items-center justify-between gap-1.5 pointer-events-none z-30">
-
+        <div class="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 pointer-events-none z-30">
           <span class="text-[10px] sm:text-xs font-mono text-white tracking-wider font-bold bg-black/70 backdrop-blur-md px-2 sm:px-2.5 py-0.5 sm:py-1 rounded shadow-lg inline-block transition-all duration-300 group-hover:bg-transparent group-hover:backdrop-blur-none group-hover:shadow-none mobile-auto-bg-fade">
             CASE #${p.id}
           </span>
-
-          ${
-            editable
-              ? `
-                <div class="flex items-center gap-1 pointer-events-auto" onclick="event.stopPropagation()">
-                  <button
-                    type="button"
-                    onclick="startEditVisitorCase('${p.id}')"
-                    title="5 分鐘內可修改"
-                    class="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded bg-white/95 text-black font-mono text-[9px] sm:text-[10px] font-bold hover:bg-emerald-400 transition-colors shadow"
-                  >
-                    ✎ 修改
-                  </button>
-                  <button
-                    type="button"
-                    onclick="deleteVisitorCase('${p.id}')"
-                    title="5 分鐘內可刪除"
-                    class="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded bg-red-950/90 text-red-400 border border-red-700/70 font-mono text-[9px] sm:text-[10px] font-bold hover:bg-red-800 hover:text-white transition-colors shadow"
-                  >
-                    ✕
-                  </button>
-                </div>
-              `
-              : ''
-          }
-
         </div>
-
-        ${
-          editable
-            ? `
-              <div class="absolute top-9 sm:top-11 left-2.5 sm:left-3 pointer-events-none z-30">
-                <span data-countdown-id="${p.id}" class="text-[8px] sm:text-[9px] font-mono text-emerald-400 bg-black/80 border border-emerald-500/30 px-1.5 sm:px-2 py-0.5 rounded">
-                  可編輯 ${formatSecondsMMSS(remainSec)}
-                </span>
-              </div>
-            `
-            : ''
-        }
 
         ${
           p.imageUrl
@@ -1517,7 +1477,7 @@ function buildCaseCardHTML(p, isVisitor = false) {
 
         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none z-20"></div>
 
-        <div class="absolute bottom-12 sm:bottom-14 left-3 right-3 sm:left-4 sm:right-4 space-y-0.5 pointer-events-none z-30">
+        <div class="absolute ${editable ? 'bottom-[74px] sm:bottom-[82px]' : 'bottom-12 sm:bottom-14'} left-3 right-3 sm:left-4 sm:right-4 space-y-0.5 pointer-events-none z-30 transition-all duration-300">
 
           <h3 class="text-sm sm:text-lg font-bold text-white tracking-wide truncate">
             ${p.name}
@@ -1529,7 +1489,30 @@ function buildCaseCardHTML(p, isVisitor = false) {
 
         </div>
 
-        <div class="absolute bottom-2.5 left-2.5 right-2.5 sm:bottom-3 sm:left-3 sm:right-3 z-30">
+        <div class="absolute bottom-2.5 left-2.5 right-2.5 sm:bottom-3 sm:left-3 sm:right-3 z-30 flex flex-col gap-1.5">
+
+          ${
+            editable
+              ? `
+                <div class="grid grid-cols-2 gap-1.5 w-full" onclick="event.stopPropagation()">
+                  <button
+                    type="button"
+                    onclick="startEditVisitorCase('${p.id}')"
+                    class="w-full py-1 sm:py-1.5 rounded bg-white/95 text-black font-mono text-[10px] sm:text-xs font-bold hover:bg-gray-200 transition-colors shadow text-center"
+                  >
+                    ✎ 修改
+                  </button>
+                  <button
+                    type="button"
+                    onclick="deleteVisitorCase('${p.id}')"
+                    class="w-full py-1 sm:py-1.5 rounded bg-red-950/90 text-red-400 border border-red-700/70 font-mono text-[10px] sm:text-xs font-bold hover:bg-red-800 hover:text-white transition-colors shadow text-center"
+                  >
+                    ✕ 刪除
+                  </button>
+                </div>
+              `
+              : ''
+          }
 
           <button class="btn-neon w-full py-1.5 sm:py-2 text-[10px] sm:text-xs rounded shadow-lg flex items-center justify-center space-x-1">
             <span>檢視個案診斷</span>
@@ -1907,7 +1890,7 @@ async function handleSelectedImageFile(file) {
 function startEditVisitorCase(id) {
   const target = VISITOR_PARTICIPANTS.find(p => p.id === id);
   if (!target || !canEditOrDeleteCase(target)) {
-    alert("此病例已超過 5 分鐘修改時限，或非原上傳裝置建立之檔案。");
+    alert("此病例已超過 3 分鐘修改時限，或非原上傳裝置建立之檔案。");
     renderPortalCards(true);
     return;
   }
@@ -1931,7 +1914,7 @@ function startEditVisitorCase(id) {
   document.getElementById('form-mode-title').innerText = `修改病例檔案：CASE #${id}`;
   document.getElementById('submit-case-btn-text').innerText = "儲存病例修改";
   document.getElementById('cancel-edit-btn').classList.remove('hidden');
-  document.getElementById('visitor-form-feedback').innerText = `正在編輯 CASE #${id}（僅限建立後 5 分鐘內修改）`;
+  document.getElementById('visitor-form-feedback').innerText = `正在編輯 CASE #${id}（僅限建立後 3 分鐘內修改）`;
 
   updateCaseCountersUI();
 
@@ -1957,7 +1940,7 @@ function cancelEditMode() {
 async function deleteVisitorCase(id) {
   const target = VISITOR_PARTICIPANTS.find(p => p.id === id);
   if (!target || !canEditOrDeleteCase(target)) {
-    alert("此病例已超過 5 分鐘刪除時限，或非原上傳裝置建立之檔案。");
+    alert("此病例已超過 3 分鐘刪除時限，或非原上傳裝置建立之檔案。");
     renderPortalCards(true);
     return;
   }
@@ -2020,7 +2003,7 @@ function initVisitorForm() {
     if (editingCaseId) {
       const idx = VISITOR_PARTICIPANTS.findIndex(p => p.id === editingCaseId);
       if (idx === -1 || !canEditOrDeleteCase(VISITOR_PARTICIPANTS[idx])) {
-        feedback.textContent = "已超過 5 分鐘可修改時限，無法儲存變更。";
+        feedback.textContent = "已超過 3 分鐘可修改時限，無法儲存變更。";
         cancelEditMode();
         renderPortalCards(true);
         return;
@@ -2091,7 +2074,7 @@ function initVisitorForm() {
     clearCapturedPhoto();
 
     if (syncResult.ok) {
-      feedback.textContent = `已建立病例 CASE #${nextId}（${resolvedName}）並同步至雲端，5 分鐘內可於本裝置修改或刪除。`;
+      feedback.textContent = `已建立病例 CASE #${nextId}（${resolvedName}）並同步至雲端，3 分鐘內可於本裝置修改或刪除。`;
     } else {
       feedback.textContent = `已建立病例 CASE #${nextId}（${resolvedName}），雲端連線異常，請確認 Firebase 測試規則權限。`;
     }
@@ -2114,28 +2097,17 @@ function startCloudSyncPolling() {
   }, 3000);
 }
 
-/* 定期檢查 5 分鐘編輯時限倒數 */
+/* 定期檢查 3 分鐘編輯時限到期狀態並重新渲染 */
 function startEditWindowTicker() {
   setInterval(() => {
-    let anyExpiredJustNow = false;
+    const expiredIds = VISITOR_PARTICIPANTS
+      .filter(p => p.ownerToken === CURRENT_DEVICE_TOKEN && p.createdAt)
+      .filter(p => (Date.now() - Number(p.createdAt)) >= EDIT_WINDOW_MS)
+      .map(p => p.id);
 
-    document.querySelectorAll('[data-countdown-id]').forEach(el => {
-      const cid = el.getAttribute('data-countdown-id');
-      const item = VISITOR_PARTICIPANTS.find(p => p.id === cid);
-      const remain = getRemainingEditSeconds(item);
-      if (remain <= 0) {
-        anyExpiredJustNow = true;
-      } else {
-        el.innerText = `可編輯 ${formatSecondsMMSS(remain)}`;
-      }
-    });
-
-    if (anyExpiredJustNow) {
-      if (editingCaseId) {
-        const editingItem = VISITOR_PARTICIPANTS.find(p => p.id === editingCaseId);
-        if (!canEditOrDeleteCase(editingItem)) {
-          cancelEditMode();
-        }
+    if (expiredIds.length > 0) {
+      if (editingCaseId && expiredIds.includes(editingCaseId)) {
+        cancelEditMode();
       }
       renderPortalCards(true);
     }
