@@ -584,11 +584,11 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
                 現場本體影像拍攝 / 選取照片 (選填 CAMERA / PHOTO)
               </span>
               <span class="block text-[10px] text-gray-500 font-sans leading-relaxed">
-                點擊下方按鈕可直接拍照或從相簿選取照片，系統將自動去背並轉換為與上方四位一致的臨床黑白高對比影像
+                點擊下方按鈕可拍照或從相簿選取照片，系統將自動去背、將頭髮轉為銀白色並套用黑白顆粒肖像效果
               </span>
             </div>
 
-            <!-- 合併為單一按鈕（不強制 capture，手機會同時顯示拍照與選取照片選項） -->
+            <!-- 單一按鈕 -->
             <div class="w-full">
 
               <label
@@ -635,7 +635,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
             <!-- 處理中提示 -->
             <div id="photo-processing-status" class="hidden text-[11px] text-emerald-400 flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span>正在進行人像去背與臨床灰階調色處理...</span>
+              <span>正在進行人像去背、白髮轉換與黑白顆粒調色處理...</span>
             </div>
 
             <!-- 影像即時預覽 -->
@@ -650,10 +650,10 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
               <div class="text-[10px] space-y-1 min-w-0">
                 <span id="photo-preview-badge" class="text-emerald-400 font-bold block">
-                  ✓ 影像已完成去背與臨床灰階處理
+                  ✓ 影像已完成去背、白髮銀白化與黑白顆粒處理
                 </span>
                 <span class="text-gray-500 block font-sans leading-relaxed">
-                  已套用純黑底色與高對比影調；可隨時切換上方「隱私模糊保護」確認遮蔽效果
+                  已套用純黑底色與細膩黑白顆粒影調；可隨時切換上方「隱私模糊保護」確認遮蔽效果
                 </span>
               </div>
 
@@ -804,7 +804,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
             id="detail-device-img"
             src=""
             alt="Proxy Device"
-            class="w-full h-full object-cover grayscale contrast-125 absolute inset-0 pointer-events-none z-0"
+            class="w-full h-full object-cover absolute inset-0 pointer-events-none z-0"
           >
 
           <div
@@ -815,7 +815,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
               id="detail-principal-img"
               src=""
               alt="Principal"
-              class="w-full h-full object-cover grayscale contrast-125 pointer-events-none"
+              class="w-full h-full object-cover pointer-events-none"
               style="max-width:none;"
             >
           </div>
@@ -1151,7 +1151,7 @@ function getDeviceToken() {
 const CURRENT_DEVICE_TOKEN = getDeviceToken();
 
 /* 影像狀態變數 */
-let rawCutoutBaseDataUrl = "";   // 去背＋灰階臨床調色後的原始清晰版本
+let rawCutoutBaseDataUrl = "";   // 去背＋白髮銀白化＋黑白顆粒調色後的清晰版本
 let capturedPhotoDataUrl = "";   // 最終輸出版本（含是否模糊化）
 let isPrivacyBlurEnabled = false;
 let editingCaseId = null;
@@ -1442,13 +1442,13 @@ function buildCaseCardHTML(p, isVisitor = false) {
               <img
                 src="${imgSrc}"
                 alt="${p.name}"
-                class="w-full h-full object-cover grayscale contrast-125 group-hover:scale-105 transition-all duration-500 absolute inset-0 z-0"
+                class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 absolute inset-0 z-0"
               >
 
               <img
                 src="${deviceImgSrc}"
                 alt="Proxy Device"
-                class="w-full h-full object-cover grayscale contrast-125 opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10"
+                class="w-full h-full object-cover opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10"
               >
             `
             : `
@@ -1535,7 +1535,7 @@ function renderPortalCards() {
   updateCaseCountersUI();
 }
 
-/* 人像去背 + 臨床灰階高對比調色引擎 */
+/* 人像去背 + 頭髮銀白化 + 參考圖高明度黑白顆粒調色引擎 */
 
 let selfieSegmenterInstance = null;
 
@@ -1558,32 +1558,126 @@ function getSelfieSegmenter() {
   }
 }
 
-/* 套用與上方四張一致的黑白高對比臨床色調 */
-function applyClinicalMonochromeTone(ctx, width, height) {
+/* 還原參考圖《林恩岑 封面.jpg》：去背純黑底 + 頭髮銀白化（保留髮絲層次）+ 高明度細膩黑白顆粒 */
+function applyClinicalMonochromeTone(ctx, width, height, alphaMaskData = null) {
   const imgData = ctx.getImageData(0, 0, width, height);
   const data = imgData.data;
 
-  for (let i = 0; i < data.length; i += 4) {
-    const r = data[i];
-    const g = data[i + 1];
-    const b = data[i + 2];
+  // 找出人像前景的垂直邊界（頭頂 yMin 與下緣 yMax），精準區分頭髮區與五官中心區
+  let yMin = height;
+  let yMax = 0;
+  let xMin = width;
+  let xMax = 0;
 
-    let lum = 0.299 * r + 0.587 * g + 0.114 * b;
+  if (alphaMaskData) {
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const a = alphaMaskData[(y * width + x) * 4 + 3];
+        if (a > 30) {
+          if (y < yMin) yMin = y;
+          if (y > yMax) yMax = y;
+          if (x < xMin) xMin = x;
+          if (x > xMax) xMax = x;
+        }
+      }
+    }
+  }
 
-    let normalized = lum / 255;
-    normalized = (normalized - 0.5) * 1.28 + 0.48;
-    normalized = Math.max(0, Math.min(1, normalized));
-    const finalGray = Math.round(normalized * 255);
+  if (yMin >= yMax) {
+    yMin = Math.round(height * 0.08);
+    yMax = Math.round(height * 0.96);
+    xMin = Math.round(width * 0.16);
+    xMax = Math.round(width * 0.84);
+  }
 
-    data[i] = finalGray;
-    data[i + 1] = finalGray;
-    data[i + 2] = finalGray;
+  const fgHeight = Math.max(1, yMax - yMin);
+  const fgWidth = Math.max(1, xMax - xMin);
+  const faceCenterX = (xMin + xMax) * 0.5;
+  const eyesCenterY = yMin + fgHeight * 0.42;
+
+  let seed = 1337;
+  function nextGrain() {
+    seed = (seed * 16807) % 2147483647;
+    return ((seed - 1) / 2147483646) - 0.5;
+  }
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4;
+      const fgAlpha = alphaMaskData ? alphaMaskData[idx + 3] / 255 : 1;
+
+      const r = data[idx];
+      const g = data[idx + 1];
+      const b = data[idx + 2];
+
+      // 原始灰階亮度 (0~1)
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+      // 計算是否位於純黑背景
+      if (fgAlpha < 0.08) {
+        const bgVal = Math.max(4, Math.min(22, Math.round((0.035 + nextGrain() * 0.03) * 255)));
+        data[idx] = bgVal;
+        data[idx + 1] = bgVal;
+        data[idx + 2] = bgVal;
+        continue;
+      }
+
+      // 計算相對頭像位置：
+      // 1) relY < 0.34 為頭頂與瀏海區域
+      // 2) 臉部正中央（眼眉鼻口核心區）保留深色瞳孔與五官立體感，避免眼睛眉毛變白
+      const relY = (y - yMin) / fgHeight;
+      const dxNorm = (x - faceCenterX) / (fgWidth * 0.25);
+      const dyNorm = (y - eyesCenterY) / (fgHeight * 0.20);
+      const coreFaceDist = Math.sqrt(dxNorm * dxNorm + dyNorm * dyNorm);
+
+      // 判斷頭髮權重（頭頂、瀏海、兩側鬢髮/長髮區的低明度像素）
+      let hairRegionWeight = 0;
+      if (relY < 0.36) {
+        hairRegionWeight = 1.0;
+      } else if (relY < 0.72) {
+        // 臉部兩側及額頭瀏海邊緣
+        hairRegionWeight = Math.min(1, Math.max(0, (coreFaceDist - 0.85) * 1.6));
+      } else {
+        // 頸部以下兩側披髮
+        hairRegionWeight = Math.min(1, Math.max(0, (Math.abs(x - faceCenterX) / (fgWidth * 0.26) - 0.75) * 1.5));
+      }
+
+      // 原始像素越黑（頭髮暗部），銀白化轉換比例越高；髮絲高光則呈現更亮的純白絲線
+      const darkness = Math.max(0, 1 - lum * 2.15);
+      const silverHairFactor = hairRegionWeight * darkness;
+
+      let mapped;
+      if (silverHairFactor > 0.05) {
+        // 將深色頭髮反轉提亮為銀白色，保留髮絲紋理明暗差異（0.62 ~ 0.96）
+        const strandTexture = Math.pow(lum / 0.48, 0.72) * 0.24;
+        const silverTone = 0.68 + strandTexture + (1 - lum) * 0.14;
+        const basePortraitTone = Math.pow(lum, 0.56) * 1.15 + 0.15;
+        mapped = basePortraitTone * (1 - silverHairFactor) + silverTone * silverHairFactor;
+      } else {
+        // 臉部肌膚、五官與衣物：高明度銀白灰階 + 清晰五官對比
+        mapped = Math.pow(lum, 0.56) * 1.16 + 0.14;
+        mapped = (mapped - 0.52) * 1.24 + 0.56;
+      }
+
+      // 前景邊緣平滑過渡到黑底，使髮絲邊緣自然融入背景
+      const edgeBlend = Math.min(1, Math.max(0, (fgAlpha - 0.08) / 0.55));
+      mapped = mapped * edgeBlend + 0.035 * (1 - edgeBlend);
+
+      // 加入細膩底片顆粒噪點
+      mapped = mapped + nextGrain() * 0.06;
+      mapped = Math.max(0, Math.min(1, mapped));
+
+      const val = Math.round(mapped * 255);
+      data[idx] = val;
+      data[idx + 1] = val;
+      data[idx + 2] = val;
+    }
   }
 
   ctx.putImageData(imgData, 0, 0);
 }
 
-/* 兜底去背（若外部模型無法載入時，依四角背景色容差＋暗角漸層移除背景） */
+/* 兜底去背（若外部模型無法載入時，依四角背景色容差＋暗角漸層建立前景遮罩） */
 function fallbackBackgroundCutout(img, width, height) {
   const canvas = document.createElement('canvas');
   canvas.width = width;
@@ -1593,6 +1687,13 @@ function fallbackBackgroundCutout(img, width, height) {
 
   const imgData = ctx.getImageData(0, 0, width, height);
   const data = imgData.data;
+
+  const maskCanvas = document.createElement('canvas');
+  maskCanvas.width = width;
+  maskCanvas.height = height;
+  const maskCtx = maskCanvas.getContext('2d');
+  const maskImgData = maskCtx.createImageData(width, height);
+  const mData = maskImgData.data;
 
   const corners = [
     0,
@@ -1612,7 +1713,7 @@ function fallbackBackgroundCutout(img, width, height) {
   bgB /= corners.length;
 
   const cx = width * 0.5;
-  const cy = height * 0.46;
+  const cy = height * 0.48;
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -1622,36 +1723,36 @@ function fallbackBackgroundCutout(img, width, height) {
       const db = data[idx + 2] - bgB;
       const colorDist = Math.sqrt(dr * dr + dg * dg + db * db);
 
-      const nx = (x - cx) / (width * 0.44);
-      const ny = (y - cy) / (height * 0.52);
+      const nx = (x - cx) / (width * 0.42);
+      const ny = (y - cy) / (height * 0.50);
       const radialDist = Math.sqrt(nx * nx + ny * ny);
 
-      if (colorDist < 42 && radialDist > 0.62) {
-        data[idx] = 8;
-        data[idx + 1] = 9;
-        data[idx + 2] = 10;
-      } else if (radialDist > 0.92) {
-        const fade = Math.max(0, 1 - (radialDist - 0.92) * 3.5);
-        data[idx] = Math.round(data[idx] * fade + 8 * (1 - fade));
-        data[idx + 1] = Math.round(data[idx + 1] * fade + 9 * (1 - fade));
-        data[idx + 2] = Math.round(data[idx + 2] * fade + 10 * (1 - fade));
+      let alpha = 255;
+      if (colorDist < 42 && radialDist > 0.60) {
+        alpha = 0;
+      } else if (radialDist > 0.94) {
+        alpha = Math.max(0, Math.round(255 * (1 - (radialDist - 0.94) * 4)));
       }
+
+      mData[idx] = 255;
+      mData[idx + 1] = 255;
+      mData[idx + 2] = 255;
+      mData[idx + 3] = alpha;
     }
   }
 
-  ctx.putImageData(imgData, 0, 0);
-  applyClinicalMonochromeTone(ctx, width, height);
-  return canvas.toDataURL('image/jpeg', 0.82);
+  applyClinicalMonochromeTone(ctx, width, height, mData);
+  return canvas.toDataURL('image/jpeg', 0.86);
 }
 
-/* 執行去背與臨床調色 */
+/* 執行去背、頭髮銀白化與黑白顆粒調色 */
 function processPortraitCutoutAndTone(file) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = function(event) {
       const img = new Image();
       img.onload = async function() {
-        const maxDim = 680;
+        const maxDim = 720;
         let width = img.width;
         let height = img.height;
 
@@ -1685,27 +1786,25 @@ function processPortraitCutoutAndTone(file) {
             resolved = true;
             clearTimeout(timeoutId);
 
-            const fgCanvas = document.createElement('canvas');
-            fgCanvas.width = width;
-            fgCanvas.height = height;
-            const fgCtx = fgCanvas.getContext('2d');
+            // 取得去背遮罩像素資料
+            const maskCanvas = document.createElement('canvas');
+            maskCanvas.width = width;
+            maskCanvas.height = height;
+            const maskCtx = maskCanvas.getContext('2d');
+            maskCtx.drawImage(results.segmentationMask, 0, 0, width, height);
+            const alphaMaskData = maskCtx.getImageData(0, 0, width, height).data;
 
-            fgCtx.drawImage(results.segmentationMask, 0, 0, width, height);
-            fgCtx.globalCompositeOperation = 'source-in';
-            fgCtx.drawImage(results.image, 0, 0, width, height);
-
+            // 繪製原圖至輸出畫布
             const outCanvas = document.createElement('canvas');
             outCanvas.width = width;
             outCanvas.height = height;
             const outCtx = outCanvas.getContext('2d');
+            outCtx.drawImage(results.image, 0, 0, width, height);
 
-            outCtx.fillStyle = '#08090a';
-            outCtx.fillRect(0, 0, width, height);
-            outCtx.drawImage(fgCanvas, 0, 0, width, height);
+            // 套用去背純黑底、白髮銀白化與細膩黑白顆粒
+            applyClinicalMonochromeTone(outCtx, width, height, alphaMaskData);
 
-            applyClinicalMonochromeTone(outCtx, width, height);
-
-            resolve(outCanvas.toDataURL('image/jpeg', 0.82));
+            resolve(outCanvas.toDataURL('image/jpeg', 0.86));
           });
 
           const inputCanvas = document.createElement('canvas');
@@ -1770,7 +1869,7 @@ function rebuildOutputPhotoWithPrivacyOption() {
         ctx.drawImage(tmpCanvas, 0, 0, smallW, smallH, 0, 0, canvas.width, canvas.height);
       }
 
-      capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.82);
       updatePhotoPreviewUI();
       resolve(capturedPhotoDataUrl);
     };
@@ -1796,8 +1895,8 @@ function updatePhotoPreviewUI() {
 
   if (previewBadge) {
     previewBadge.innerText = isPrivacyBlurEnabled
-      ? "✓ 影像已完成去背＋臨床灰階＋隱私模糊加密"
-      : "✓ 影像已完成自動去背與臨床灰階調色";
+      ? "✓ 影像已完成去背＋白髮銀白化＋隱私模糊加密"
+      : "✓ 影像已完成去背、白髮銀白化與黑白顆粒調色";
   }
 }
 
