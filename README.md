@@ -1240,6 +1240,10 @@ function getAllParticipants() {
   return [...BASE_PARTICIPANTS, ...VISITOR_PARTICIPANTS];
 }
 
+function isVisitorCaseById(id) {
+  return VISITOR_PARTICIPANTS.some(p => p.id === id);
+}
+
 function canEditOrDeleteCase(caseItem) {
   if (!caseItem || !caseItem.ownerToken || !caseItem.createdAt) return false;
   if (caseItem.ownerToken !== CURRENT_DEVICE_TOKEN) return false;
@@ -1413,6 +1417,56 @@ function initComparisonSlider() {
 
   window.addEventListener('resize', updateImgDimensions);
   updateImgDimensions();
+}
+
+/* 設定詳情頁是否顯示左右對比滑桿（觀眾病例不顯示滑桿） */
+function setDetailSliderVisibility(isVisitorCase) {
+  const clipWrapper = document.getElementById('slider-clip-wrapper');
+  const sliderInput = document.getElementById('comparison-slider');
+  const sliderLine = document.getElementById('slider-line');
+  const badgePrincipal = document.getElementById('badge-principal');
+  const badgeDevice = document.getElementById('badge-device');
+  const principalImg = document.getElementById('detail-principal-img');
+
+  if (isVisitorCase) {
+    if (clipWrapper) clipWrapper.style.display = 'none';
+    if (sliderInput) sliderInput.style.display = 'none';
+    if (sliderLine) sliderLine.style.display = 'none';
+    if (badgePrincipal) badgePrincipal.style.display = 'none';
+    if (badgeDevice) badgeDevice.style.display = 'none';
+    if (principalImg) {
+      principalImg.style.width = '100%';
+      principalImg.style.height = '100%';
+      principalImg.style.maxWidth = '100%';
+    }
+  } else {
+    if (clipWrapper) {
+      clipWrapper.style.display = '';
+      clipWrapper.style.width = '50%';
+    }
+    if (sliderInput) {
+      sliderInput.style.display = '';
+      sliderInput.value = 50;
+    }
+    if (sliderLine) {
+      sliderLine.style.display = '';
+      sliderLine.style.left = '50%';
+    }
+    if (badgePrincipal) {
+      badgePrincipal.style.display = '';
+      badgePrincipal.className =
+        "absolute bottom-2.5 left-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive";
+    }
+    if (badgeDevice) {
+      badgeDevice.style.display = '';
+      badgeDevice.className =
+        "absolute bottom-2.5 right-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive";
+    }
+    if (principalImg) {
+      principalImg.style.maxWidth = 'none';
+    }
+    updateImgDimensions();
+  }
 }
 
 /* 單張卡片模板（左上僅留 CASE 編號；修改/刪除置於檢視按鈕上方、左右對齊、各佔一半） */
@@ -2152,6 +2206,7 @@ function showDetail(id) {
   const allCases = getAllParticipants();
   const data = allCases.find(p => p.id === id) || BASE_PARTICIPANTS[0];
   currentDetailCaseId = data.id;
+  const isVisitorCase = isVisitorCaseById(data.id);
 
   document.getElementById('header-output-box').style.display = 'none';
   updateDetailOwnerControls(data.id);
@@ -2169,27 +2224,25 @@ function showDetail(id) {
   const principalImg = document.getElementById('detail-principal-img');
   const deviceImg = document.getElementById('detail-device-img');
   const noImgFallback = document.getElementById('detail-no-image-fallback');
-  const clipWrapper = document.getElementById('slider-clip-wrapper');
-  const sliderLine = document.getElementById('slider-line');
 
   const pUrl = formatImageSrc(data.imageUrl);
   const dUrl = formatImageSrc(data.deviceImageUrl || data.imageUrl);
 
   if (pUrl) {
     principalImg.src = pUrl;
-    deviceImg.src = dUrl;
+    deviceImg.src = isVisitorCase ? '' : dUrl;
     principalImg.classList.remove('hidden');
-    deviceImg.classList.remove('hidden');
-    clipWrapper.classList.remove('hidden');
-    sliderLine.classList.remove('hidden');
+    if (isVisitorCase) {
+      deviceImg.classList.add('hidden');
+    } else {
+      deviceImg.classList.remove('hidden');
+    }
     if (noImgFallback) noImgFallback.classList.add('hidden');
   } else {
     principalImg.src = '';
     deviceImg.src = '';
     principalImg.classList.add('hidden');
     deviceImg.classList.add('hidden');
-    clipWrapper.classList.add('hidden');
-    sliderLine.classList.add('hidden');
     if (noImgFallback) noImgFallback.classList.remove('hidden');
   }
 
@@ -2205,16 +2258,7 @@ function showDetail(id) {
     sigPlaceholder.classList.remove('hidden');
   }
 
-  document.getElementById('comparison-slider').value = 50;
-  clipWrapper.style.width = '50%';
-  sliderLine.style.left = '50%';
-
-  document.getElementById('badge-principal').className =
-    "absolute bottom-2.5 left-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive";
-
-  document.getElementById('badge-device').className =
-    "absolute bottom-2.5 right-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive";
-
+  setDetailSliderVisibility(isVisitorCase);
   startBreathCounter(data.birthDate);
 
   document.getElementById('portal-view').classList.add('hidden');
@@ -2225,7 +2269,9 @@ function showDetail(id) {
     behavior: 'smooth'
   });
 
-  setTimeout(updateImgDimensions, 60);
+  if (!isVisitorCase) {
+    setTimeout(updateImgDimensions, 60);
+  }
 }
 
 /* 初始化 */
