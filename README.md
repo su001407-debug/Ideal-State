@@ -584,7 +584,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
                 現場本體影像拍攝 / 選取照片 (選填 CAMERA / PHOTO)
               </span>
               <span class="block text-[10px] text-gray-500 font-sans leading-relaxed">
-                點擊下方按鈕可拍照或從相簿選取照片，系統將自動去背、將頭髮轉為銀白色並套用黑白顆粒肖像效果
+                點擊下方按鈕可拍照或從相簿選取照片，系統將自動去背、將頭髮轉為銀白色並保留清楚五官層次
               </span>
             </div>
 
@@ -635,7 +635,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
             <!-- 處理中提示 -->
             <div id="photo-processing-status" class="hidden text-[11px] text-emerald-400 flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span>正在進行人像去背、白髮轉換與黑白顆粒調色處理...</span>
+              <span>正在進行人像去背、白髮轉換與五官對比調色處理...</span>
             </div>
 
             <!-- 影像即時預覽 -->
@@ -650,7 +650,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
               <div class="text-[10px] space-y-1 min-w-0">
                 <span id="photo-preview-badge" class="text-emerald-400 font-bold block">
-                  ✓ 影像已完成去背、白髮銀白化與黑白顆粒處理
+                  ✓ 影像已完成去背、白髮銀白化與五官層次調色
                 </span>
                 <span class="text-gray-500 block font-sans leading-relaxed">
                   已套用純黑底色與細膩黑白顆粒影調；可隨時切換上方「隱私模糊保護」確認遮蔽效果
@@ -1151,7 +1151,7 @@ function getDeviceToken() {
 const CURRENT_DEVICE_TOKEN = getDeviceToken();
 
 /* 影像狀態變數 */
-let rawCutoutBaseDataUrl = "";   // 去背＋白髮銀白化＋黑白顆粒調色後的清晰版本
+let rawCutoutBaseDataUrl = "";   // 去背＋白髮銀白化＋保留五官層次的清晰版本
 let capturedPhotoDataUrl = "";   // 最終輸出版本（含是否模糊化）
 let isPrivacyBlurEnabled = false;
 let editingCaseId = null;
@@ -1535,7 +1535,7 @@ function renderPortalCards() {
   updateCaseCountersUI();
 }
 
-/* 人像去背 + 頭髮銀白化 + 參考圖高明度黑白顆粒調色引擎 */
+/* 人像去背 + 頭髮銀白化 + 清晰五官層次調色引擎 */
 
 let selfieSegmenterInstance = null;
 
@@ -1558,12 +1558,11 @@ function getSelfieSegmenter() {
   }
 }
 
-/* 還原參考圖《林恩岑 封面.jpg》：去背純黑底 + 頭髮銀白化（保留髮絲層次）+ 高明度細膩黑白顆粒 */
+/* 去背純黑底 + 頭髮銀白化 + 清楚保留五官明暗層次與細膩顆粒 */
 function applyClinicalMonochromeTone(ctx, width, height, alphaMaskData = null) {
   const imgData = ctx.getImageData(0, 0, width, height);
   const data = imgData.data;
 
-  // 找出人像前景的垂直邊界（頭頂 yMin 與下緣 yMax），精準區分頭髮區與五官中心區
   let yMin = height;
   let yMax = 0;
   let xMin = width;
@@ -1613,58 +1612,55 @@ function applyClinicalMonochromeTone(ctx, width, height, alphaMaskData = null) {
       // 原始灰階亮度 (0~1)
       const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
 
-      // 計算是否位於純黑背景
+      // 背景維持深邃黑底與微弱顆粒
       if (fgAlpha < 0.08) {
-        const bgVal = Math.max(4, Math.min(22, Math.round((0.035 + nextGrain() * 0.03) * 255)));
+        const bgVal = Math.max(4, Math.min(20, Math.round((0.032 + nextGrain() * 0.025) * 255)));
         data[idx] = bgVal;
         data[idx + 1] = bgVal;
         data[idx + 2] = bgVal;
         continue;
       }
 
-      // 計算相對頭像位置：
-      // 1) relY < 0.34 為頭頂與瀏海區域
-      // 2) 臉部正中央（眼眉鼻口核心區）保留深色瞳孔與五官立體感，避免眼睛眉毛變白
       const relY = (y - yMin) / fgHeight;
       const dxNorm = (x - faceCenterX) / (fgWidth * 0.25);
       const dyNorm = (y - eyesCenterY) / (fgHeight * 0.20);
       const coreFaceDist = Math.sqrt(dxNorm * dxNorm + dyNorm * dyNorm);
 
-      // 判斷頭髮權重（頭頂、瀏海、兩側鬢髮/長髮區的低明度像素）
+      // 頭髮區域權重
       let hairRegionWeight = 0;
-      if (relY < 0.36) {
+      if (relY < 0.35) {
         hairRegionWeight = 1.0;
       } else if (relY < 0.72) {
-        // 臉部兩側及額頭瀏海邊緣
         hairRegionWeight = Math.min(1, Math.max(0, (coreFaceDist - 0.85) * 1.6));
       } else {
-        // 頸部以下兩側披髮
         hairRegionWeight = Math.min(1, Math.max(0, (Math.abs(x - faceCenterX) / (fgWidth * 0.26) - 0.75) * 1.5));
       }
 
-      // 原始像素越黑（頭髮暗部），銀白化轉換比例越高；髮絲高光則呈現更亮的純白絲線
-      const darkness = Math.max(0, 1 - lum * 2.15);
+      // 暗部髮絲銀白化係數
+      const darkness = Math.max(0, 1 - lum * 2.2);
       const silverHairFactor = hairRegionWeight * darkness;
+
+      // 適度對比與中明度保留，避免五官過曝死白
+      let faceTone = Math.pow(lum, 0.85) * 0.96 + 0.03;
+      faceTone = (faceTone - 0.48) * 1.25 + 0.48;
+      faceTone = Math.max(0.04, Math.min(0.92, faceTone));
 
       let mapped;
       if (silverHairFactor > 0.05) {
-        // 將深色頭髮反轉提亮為銀白色，保留髮絲紋理明暗差異（0.62 ~ 0.96）
-        const strandTexture = Math.pow(lum / 0.48, 0.72) * 0.24;
-        const silverTone = 0.68 + strandTexture + (1 - lum) * 0.14;
-        const basePortraitTone = Math.pow(lum, 0.56) * 1.15 + 0.15;
-        mapped = basePortraitTone * (1 - silverHairFactor) + silverTone * silverHairFactor;
+        // 頭髮呈銀白色（約 0.58 ~ 0.90），同時保留髮絲紋理起伏
+        const strandTexture = Math.pow(lum / 0.5, 0.75) * 0.22;
+        const silverTone = 0.60 + strandTexture + (1 - lum) * 0.12;
+        mapped = faceTone * (1 - silverHairFactor) + silverTone * silverHairFactor;
       } else {
-        // 臉部肌膚、五官與衣物：高明度銀白灰階 + 清晰五官對比
-        mapped = Math.pow(lum, 0.56) * 1.16 + 0.14;
-        mapped = (mapped - 0.52) * 1.24 + 0.56;
+        mapped = faceTone;
       }
 
-      // 前景邊緣平滑過渡到黑底，使髮絲邊緣自然融入背景
+      // 前景邊緣平滑過渡到黑底
       const edgeBlend = Math.min(1, Math.max(0, (fgAlpha - 0.08) / 0.55));
-      mapped = mapped * edgeBlend + 0.035 * (1 - edgeBlend);
+      mapped = mapped * edgeBlend + 0.032 * (1 - edgeBlend);
 
       // 加入細膩底片顆粒噪點
-      mapped = mapped + nextGrain() * 0.06;
+      mapped = mapped + nextGrain() * 0.05;
       mapped = Math.max(0, Math.min(1, mapped));
 
       const val = Math.round(mapped * 255);
@@ -1745,7 +1741,7 @@ function fallbackBackgroundCutout(img, width, height) {
   return canvas.toDataURL('image/jpeg', 0.86);
 }
 
-/* 執行去背、頭髮銀白化與黑白顆粒調色 */
+/* 執行去背、頭髮銀白化與五官層次調色 */
 function processPortraitCutoutAndTone(file) {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -1786,7 +1782,6 @@ function processPortraitCutoutAndTone(file) {
             resolved = true;
             clearTimeout(timeoutId);
 
-            // 取得去背遮罩像素資料
             const maskCanvas = document.createElement('canvas');
             maskCanvas.width = width;
             maskCanvas.height = height;
@@ -1794,14 +1789,12 @@ function processPortraitCutoutAndTone(file) {
             maskCtx.drawImage(results.segmentationMask, 0, 0, width, height);
             const alphaMaskData = maskCtx.getImageData(0, 0, width, height).data;
 
-            // 繪製原圖至輸出畫布
             const outCanvas = document.createElement('canvas');
             outCanvas.width = width;
             outCanvas.height = height;
             const outCtx = outCanvas.getContext('2d');
             outCtx.drawImage(results.image, 0, 0, width, height);
 
-            // 套用去背純黑底、白髮銀白化與細膩黑白顆粒
             applyClinicalMonochromeTone(outCtx, width, height, alphaMaskData);
 
             resolve(outCanvas.toDataURL('image/jpeg', 0.86));
@@ -1896,7 +1889,7 @@ function updatePhotoPreviewUI() {
   if (previewBadge) {
     previewBadge.innerText = isPrivacyBlurEnabled
       ? "✓ 影像已完成去背＋白髮銀白化＋隱私模糊加密"
-      : "✓ 影像已完成去背、白髮銀白化與黑白顆粒調色";
+      : "✓ 影像已完成去背、白髮銀白化與五官層次調色";
   }
 }
 
