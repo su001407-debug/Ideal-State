@@ -575,49 +575,33 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
           </div>
 
-          <!-- 手機照相與相簿選取建檔區（選填） -->
+          <!-- 拍照與選取照片建檔區（選填） -->
 
           <div class="bg-gray-950/75 border border-gray-800/90 rounded-lg p-4 sm:p-5 space-y-4 w-full">
 
             <div class="space-y-1">
               <span class="block text-[11px] text-gray-200 font-bold">
-                現場本體影像建檔 (選填 CAMERA / PHOTO ALBUM)
+                現場本體影像拍攝 / 選取照片 (選填 CAMERA / PHOTO)
               </span>
               <span class="block text-[10px] text-gray-500 font-sans leading-relaxed">
-                支援手機現場拍照或從相簿選取照片，系統將自動去背並轉換為與上方四位一致的臨床黑白高對比影像
+                點擊下方按鈕可直接拍照或從相簿選取照片，系統將自動去背並轉換為與上方四位一致的臨床黑白高對比影像
               </span>
             </div>
 
-            <!-- 拍照與相簿雙按鈕 -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+            <!-- 合併為單一按鈕（不強制 capture，手機會同時顯示拍照與選取照片選項） -->
+            <div class="w-full">
 
               <label
-                for="visitor-camera-input"
+                for="visitor-photo-input"
                 class="btn-white w-full py-2.5 px-4 rounded text-xs inline-flex items-center justify-center gap-2 cursor-pointer text-center"
               >
                 <span>📷</span>
-                <span>現場開啟相機拍照</span>
-              </label>
-
-              <label
-                for="visitor-album-input"
-                class="w-full py-2.5 px-4 rounded text-xs inline-flex items-center justify-center gap-2 cursor-pointer text-center bg-gray-900 hover:bg-gray-800 text-white border border-gray-700 font-bold transition-colors"
-              >
-                <span>🖼️</span>
-                <span>從手機相簿選取照片</span>
+                <span>拍照 / 選取照片</span>
               </label>
 
               <input
                 type="file"
-                id="visitor-camera-input"
-                accept="image/*"
-                capture="user"
-                class="hidden"
-              >
-
-              <input
-                type="file"
-                id="visitor-album-input"
+                id="visitor-photo-input"
                 accept="image/*"
                 class="hidden"
               >
@@ -1584,10 +1568,8 @@ function applyClinicalMonochromeTone(ctx, width, height) {
     const g = data[i + 1];
     const b = data[i + 2];
 
-    // 灰階加權計算
     let lum = 0.299 * r + 0.587 * g + 0.114 * b;
 
-    // 高對比 S 曲線與暗部壓沉，模擬上方四件雕塑的臨床攝影質感
     let normalized = lum / 255;
     normalized = (normalized - 0.5) * 1.28 + 0.48;
     normalized = Math.max(0, Math.min(1, normalized));
@@ -1612,7 +1594,6 @@ function fallbackBackgroundCutout(img, width, height) {
   const imgData = ctx.getImageData(0, 0, width, height);
   const data = imgData.data;
 
-  // 取左上、右上角落像素作為背景基準色
   const corners = [
     0,
     (width - 1) * 4,
@@ -1704,7 +1685,6 @@ function processPortraitCutoutAndTone(file) {
             resolved = true;
             clearTimeout(timeoutId);
 
-            // 1. 先繪製去背遮罩，保留人像本體
             const fgCanvas = document.createElement('canvas');
             fgCanvas.width = width;
             fgCanvas.height = height;
@@ -1714,7 +1694,6 @@ function processPortraitCutoutAndTone(file) {
             fgCtx.globalCompositeOperation = 'source-in';
             fgCtx.drawImage(results.image, 0, 0, width, height);
 
-            // 2. 合成到與作品一致的深黑臨床背景 (#08090a)
             const outCanvas = document.createElement('canvas');
             outCanvas.width = width;
             outCanvas.height = height;
@@ -1724,7 +1703,6 @@ function processPortraitCutoutAndTone(file) {
             outCtx.fillRect(0, 0, width, height);
             outCtx.drawImage(fgCanvas, 0, 0, width, height);
 
-            // 3. 套用臨床高對比黑白影調
             applyClinicalMonochromeTone(outCtx, width, height);
 
             resolve(outCanvas.toDataURL('image/jpeg', 0.82));
@@ -1775,13 +1753,11 @@ function rebuildOutputPhotoWithPrivacyOption() {
       ctx.fillStyle = '#08090a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 烘焙高斯模糊保護臉部特徵（支援所有手機瀏覽器，含無 ctx.filter 的舊版 Safari）
       if (typeof ctx.filter !== 'undefined') {
         ctx.filter = 'blur(14px)';
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         ctx.filter = 'none';
       } else {
-        // 降採樣＋放大法實現跨瀏覽器不可逆像素模糊
         const smallW = Math.max(18, Math.round(canvas.width * 0.06));
         const smallH = Math.max(24, Math.round(canvas.height * 0.06));
         const tmpCanvas = document.createElement('canvas');
@@ -1851,14 +1827,12 @@ async function togglePrivacyBlur() {
 function clearCapturedPhoto() {
   rawCutoutBaseDataUrl = "";
   capturedPhotoDataUrl = "";
-  const cameraInput = document.getElementById('visitor-camera-input');
-  const albumInput = document.getElementById('visitor-album-input');
+  const photoInput = document.getElementById('visitor-photo-input');
   const previewBox = document.getElementById('photo-preview-box');
   const previewImg = document.getElementById('photo-preview-img');
   const clearBtn = document.getElementById('clear-photo-btn');
 
-  if (cameraInput) cameraInput.value = "";
-  if (albumInput) albumInput.value = "";
+  if (photoInput) photoInput.value = "";
   if (previewImg) previewImg.src = "";
   if (previewBox) previewBox.classList.add('hidden');
   if (clearBtn) clearBtn.classList.add('hidden');
@@ -1963,18 +1937,10 @@ function deleteVisitorCase(id) {
 function initVisitorForm() {
   const form = document.getElementById('visitor-case-form');
   const feedback = document.getElementById('visitor-form-feedback');
-  const cameraInput = document.getElementById('visitor-camera-input');
-  const albumInput = document.getElementById('visitor-album-input');
+  const photoInput = document.getElementById('visitor-photo-input');
 
-  if (cameraInput) {
-    cameraInput.addEventListener('change', function(e) {
-      const file = e.target.files && e.target.files[0];
-      handleSelectedImageFile(file);
-    });
-  }
-
-  if (albumInput) {
-    albumInput.addEventListener('change', function(e) {
+  if (photoInput) {
+    photoInput.addEventListener('change', function(e) {
       const file = e.target.files && e.target.files[0];
       handleSelectedImageFile(file);
     });
@@ -1995,7 +1961,6 @@ function initVisitorForm() {
       return;
     }
 
-    // 若處於 5 分鐘內的修改模式
     if (editingCaseId) {
       const idx = VISITOR_PARTICIPANTS.findIndex(p => p.id === editingCaseId);
       if (idx === -1 || !canEditOrDeleteCase(VISITOR_PARTICIPANTS[idx])) {
@@ -2029,7 +1994,6 @@ function initVisitorForm() {
       return;
     }
 
-    // 新增病例模式
     const maxNum = VISITOR_PARTICIPANTS.reduce((max, item) => {
       const n = parseInt(item.id, 10);
       return !isNaN(n) && n > max ? n : max;
