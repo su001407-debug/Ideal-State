@@ -1119,7 +1119,7 @@ const BASE_PARTICIPANTS = [
 
 const VISITOR_STORAGE_KEY = "IDEAL_STATE_VISITOR_CASES_2026";
 const DEVICE_TOKEN_KEY = "IDEAL_STATE_DEVICE_TOKEN_2026";
-const EDIT_WINDOW_MS = 3 * 60 * 1000; // 3 分鐘可編輯/刪除視窗
+const EDIT_WINDOW_MS = 3 * 60 * 1000;
 
 function hasFirebaseConfigured() {
   return Boolean(
@@ -1128,7 +1128,6 @@ function hasFirebaseConfigured() {
   );
 }
 
-/* 取得本機裝置唯一識別碼（確保只有原上傳裝置能在 3 分鐘內修改或刪除） */
 function getDeviceToken() {
   try {
     let token = localStorage.getItem(DEVICE_TOKEN_KEY);
@@ -1165,6 +1164,11 @@ function formatImageSrc(url) {
     return `${url}?v=${Date.now()}`;
   }
   return "";
+}
+
+function resolveParticipantPrimaryImage(p) {
+  if (!p) return "";
+  return formatImageSrc(p.imageUrl || p.deviceImageUrl || p.rawImageUrl || "");
 }
 
 function loadLocalVisitorCases() {
@@ -1432,7 +1436,6 @@ function setDetailSliderVisibility(isVisitorCase) {
   const sliderLine = document.getElementById('slider-line');
   const badgePrincipal = document.getElementById('badge-principal');
   const badgeDevice = document.getElementById('badge-device');
-  const principalImg = document.getElementById('detail-principal-img');
 
   if (isVisitorCase) {
     if (clipWrapper) clipWrapper.style.display = 'none';
@@ -1440,11 +1443,6 @@ function setDetailSliderVisibility(isVisitorCase) {
     if (sliderLine) sliderLine.style.display = 'none';
     if (badgePrincipal) badgePrincipal.style.display = 'none';
     if (badgeDevice) badgeDevice.style.display = 'none';
-    if (principalImg) {
-      principalImg.style.width = '100%';
-      principalImg.style.height = '100%';
-      principalImg.style.maxWidth = '100%';
-    }
   } else {
     if (clipWrapper) {
       clipWrapper.style.display = '';
@@ -1468,17 +1466,14 @@ function setDetailSliderVisibility(isVisitorCase) {
       badgeDevice.className =
         "absolute bottom-2.5 right-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive";
     }
-    if (principalImg) {
-      principalImg.style.maxWidth = 'none';
-    }
     updateImgDimensions();
   }
 }
 
-/* 單張卡片模板（左上僅留 CASE 編號；修改/刪除置於檢視按鈕上方、左右對齊、各佔一半） */
+/* 單張卡片模板 */
 function buildCaseCardHTML(p, isVisitor = false) {
-  const imgSrc = formatImageSrc(p.imageUrl);
-  const deviceImgSrc = formatImageSrc(p.deviceImageUrl || p.imageUrl);
+  const imgSrc = resolveParticipantPrimaryImage(p);
+  const deviceImgSrc = formatImageSrc(p.deviceImageUrl || p.imageUrl || p.rawImageUrl || "");
   const editable = isVisitor && canEditOrDeleteCase(p);
 
   return `
@@ -1505,12 +1500,18 @@ function buildCaseCardHTML(p, isVisitor = false) {
                 class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 absolute inset-0 z-0"
               >
 
-              <img
-                src="${deviceImgSrc}"
-                alt="Proxy Device"
-                onerror="this.style.display='none'"
-                class="w-full h-full object-cover opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10"
-              >
+              ${
+                !isVisitor && deviceImgSrc
+                  ? `
+                    <img
+                      src="${deviceImgSrc}"
+                      alt="Proxy Device"
+                      onerror="this.style.display='none'"
+                      class="w-full h-full object-cover opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10"
+                    >
+                  `
+                  : ''
+              }
             `
             : `
               <div class="flex flex-col items-center space-y-2 text-gray-700">
@@ -1591,7 +1592,7 @@ function buildCaseCardHTML(p, isVisitor = false) {
 
 /* 渲染原始四位卡片與現場觀眾獨立卡片 */
 function renderPortalCards(force = false) {
-  const sig = VISITOR_PARTICIPANTS.map(p => `${p.id}|${p.name}|${p.statement}|${Boolean(p.imageUrl)}`).join("||");
+  const sig = VISITOR_PARTICIPANTS.map(p => `${p.id}|${p.name}|${p.statement}|${Boolean(resolveParticipantPrimaryImage(p))}`).join("||");
   if (!force && sig === lastRenderedSignature) {
     updateCaseCountersUI();
     return;
@@ -1967,7 +1968,7 @@ function startEditVisitorCase(id) {
 
   if (target.rawImageUrl || target.imageUrl) {
     rawCutoutBaseDataUrl = target.rawImageUrl || target.imageUrl;
-    capturedPhotoDataUrl = target.imageUrl;
+    capturedPhotoDataUrl = target.imageUrl || target.rawImageUrl;
     updatePhotoPreviewUI();
   } else {
     clearCapturedPhoto();
@@ -2150,7 +2151,7 @@ function startCloudSyncPolling() {
   setInterval(async () => {
     if (editingCaseId) return;
     const cloudCases = await fetchCloudVisitorCases();
-    const nextSig = cloudCases.map(p => `${p.id}|${p.name}|${p.statement}|${Boolean(p.imageUrl)}`).join("||");
+    const nextSig = cloudCases.map(p => `${p.id}|${p.name}|${p.statement}|${Boolean(resolveParticipantPrimaryImage(p))}`).join("||");
     if (nextSig !== lastRenderedSignature) {
       VISITOR_PARTICIPANTS = cloudCases;
       saveLocalVisitorCases(cloudCases);
@@ -2233,22 +2234,30 @@ function showDetail(id) {
   const deviceImg = document.getElementById('detail-device-img');
   const noImgFallback = document.getElementById('detail-no-image-fallback');
 
-  const pUrl = formatImageSrc(data.imageUrl);
-  const dUrl = formatImageSrc(data.deviceImageUrl || data.imageUrl);
+  const pUrl = resolveParticipantPrimaryImage(data);
+  const dUrl = formatImageSrc(data.deviceImageUrl || data.imageUrl || data.rawImageUrl || "");
 
-  principalImg.onerror = function() {
+  const handleImgError = function() {
     principalImg.classList.add('hidden');
     deviceImg.classList.add('hidden');
     if (noImgFallback) noImgFallback.classList.remove('hidden');
   };
 
+  principalImg.onerror = handleImgError;
+  deviceImg.onerror = handleImgError;
+
   if (pUrl) {
-    principalImg.src = pUrl;
-    deviceImg.src = isVisitorCase ? '' : dUrl;
-    principalImg.classList.remove('hidden');
     if (isVisitorCase) {
-      deviceImg.classList.add('hidden');
+      // 觀眾病例：滑桿外層 wrapper 隱藏，因此直接用滿版的 detail-device-img 顯示觀眾本體照片
+      principalImg.src = '';
+      principalImg.classList.add('hidden');
+      deviceImg.src = pUrl;
+      deviceImg.classList.remove('hidden');
     } else {
+      // 原始四位委託人：保留左右滑桿對比
+      principalImg.src = pUrl;
+      deviceImg.src = dUrl;
+      principalImg.classList.remove('hidden');
       deviceImg.classList.remove('hidden');
     }
     if (noImgFallback) noImgFallback.classList.add('hidden');
