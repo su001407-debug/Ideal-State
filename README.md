@@ -766,70 +766,6 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
           class="w-full h-full min-h-[360px] md:min-h-full bg-gray-950 rounded-lg overflow-hidden border border-gray-800 relative select-none group"
         >
 
-          <!-- 觀眾病例專屬獨立照片顯示 -->
-          <img
-            id="detail-visitor-img"
-            src=""
-            alt="Visitor Portrait"
-            class="hidden w-full h-full object-cover absolute inset-0 z-10 pointer-events-none"
-          >
-
-          <!-- 原始四位委託人專用滑桿對比區塊 -->
-          <div id="detail-base-comparison-group" class="w-full h-full absolute inset-0">
-            <img
-              id="detail-device-img"
-              src=""
-              alt="Proxy Device"
-              class="w-full h-full object-cover absolute inset-0 pointer-events-none z-0"
-            >
-
-            <div
-              id="slider-clip-wrapper"
-              class="absolute inset-0 overflow-hidden w-1/2 border-r-2 border-emerald-500 z-10"
-            >
-              <img
-                id="detail-principal-img"
-                src=""
-                alt="Principal"
-                class="w-full h-full object-cover pointer-events-none"
-                style="max-width:none;"
-              >
-            </div>
-
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value="50"
-              id="comparison-slider"
-              class="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-30"
-            >
-
-            <div
-              id="slider-line"
-              class="absolute top-0 bottom-0 w-0.5 bg-emerald-500 pointer-events-none z-20 left-1/2 -translate-x-1/2 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
-            >
-              <div class="w-6 h-6 rounded-full bg-emerald-500 text-black font-extrabold text-[10px] flex items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-lg">
-                ◄►
-              </div>
-            </div>
-
-            <span
-              id="badge-principal"
-              class="absolute bottom-2.5 left-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive"
-            >
-              本體 PRINCIPAL
-            </span>
-
-            <span
-              id="badge-device"
-              class="absolute bottom-2.5 right-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive"
-            >
-              裝置 PROXY DEVICE
-            </span>
-          </div>
-
-          <!-- 無影像資料提示 -->
           <div
             id="detail-no-image-fallback"
             class="hidden absolute inset-0 flex flex-col items-center justify-center space-y-2 text-gray-700 z-20 bg-gray-950"
@@ -851,6 +787,67 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
               NO SCAN DATA
             </span>
           </div>
+
+          <!-- 觀眾病例專屬照片 -->
+          <img
+            id="detail-visitor-img"
+            src=""
+            alt="Visitor Portrait"
+            class="hidden w-full h-full object-cover absolute inset-0 z-10 pointer-events-none"
+          >
+
+          <!-- 原始四位委託人專用結構 -->
+          <img
+            id="detail-device-img"
+            src=""
+            alt="Proxy Device"
+            class="w-full h-full object-cover absolute inset-0 pointer-events-none z-0"
+          >
+
+          <div
+            id="slider-clip-wrapper"
+            class="absolute inset-0 overflow-hidden w-1/2 border-r-2 border-emerald-500 z-10"
+          >
+            <img
+              id="detail-principal-img"
+              src=""
+              alt="Principal"
+              class="w-full h-full object-cover pointer-events-none"
+              style="max-width:none;"
+            >
+          </div>
+
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value="50"
+            id="comparison-slider"
+            class="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-30"
+          >
+
+          <div
+            id="slider-line"
+            class="absolute top-0 bottom-0 w-0.5 bg-emerald-500 pointer-events-none z-20 left-1/2 -translate-x-1/2 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+          >
+            <div class="w-6 h-6 rounded-full bg-emerald-500 text-black font-extrabold text-[10px] flex items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-lg">
+              ◄►
+            </div>
+          </div>
+
+          <span
+            id="badge-principal"
+            class="absolute bottom-2.5 left-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive"
+          >
+            本體 PRINCIPAL
+          </span>
+
+          <span
+            id="badge-device"
+            class="absolute bottom-2.5 right-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive"
+          >
+            裝置 PROXY DEVICE
+          </span>
 
         </div>
 
@@ -1439,6 +1436,61 @@ function initComparisonSlider() {
 
   window.addEventListener('resize', updateImgDimensions);
   updateImgDimensions();
+}
+
+/* 切換詳情頁左側顯示模式：觀眾病例隱藏滑桿並顯示獨立觀眾照片，原始四位還原滑桿對比 */
+function applyDetailLeftMode(isVisitorCase) {
+  const visitorImg = document.getElementById('detail-visitor-img');
+  const clipWrapper = document.getElementById('slider-clip-wrapper');
+  const principalImg = document.getElementById('detail-principal-img');
+  const deviceImg = document.getElementById('detail-device-img');
+  const sliderInput = document.getElementById('comparison-slider');
+  const sliderLine = document.getElementById('slider-line');
+  const badgePrincipal = document.getElementById('badge-principal');
+  const badgeDevice = document.getElementById('badge-device');
+
+  if (isVisitorCase) {
+    if (clipWrapper) clipWrapper.style.display = 'none';
+    if (deviceImg) deviceImg.style.display = 'none';
+    if (sliderInput) sliderInput.style.display = 'none';
+    if (sliderLine) sliderLine.style.display = 'none';
+    if (badgePrincipal) badgePrincipal.style.display = 'none';
+    if (badgeDevice) badgeDevice.style.display = 'none';
+  } else {
+    if (visitorImg) {
+      visitorImg.src = '';
+      visitorImg.classList.add('hidden');
+    }
+    if (clipWrapper) {
+      clipWrapper.style.display = '';
+      clipWrapper.style.width = '50%';
+    }
+    if (deviceImg) {
+      deviceImg.style.display = '';
+    }
+    if (sliderInput) {
+      sliderInput.style.display = '';
+      sliderInput.value = 50;
+    }
+    if (sliderLine) {
+      sliderLine.style.display = '';
+      sliderLine.style.left = '50%';
+    }
+    if (badgePrincipal) {
+      badgePrincipal.style.display = '';
+      badgePrincipal.className =
+        "absolute bottom-2.5 left-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive";
+    }
+    if (badgeDevice) {
+      badgeDevice.style.display = '';
+      badgeDevice.className =
+        "absolute bottom-2.5 right-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive";
+    }
+    if (principalImg) {
+      principalImg.style.maxWidth = 'none';
+    }
+    updateImgDimensions();
+  }
 }
 
 /* 單張卡片模板 */
@@ -2202,16 +2254,14 @@ function showDetail(id) {
     `自出生日期 ${data.birthDate} 起算，依成人平靜狀態每分鐘 15 次呼吸即時動態估算`;
 
   const visitorImg = document.getElementById('detail-visitor-img');
-  const baseComparisonGroup = document.getElementById('detail-base-comparison-group');
   const principalImg = document.getElementById('detail-principal-img');
   const deviceImg = document.getElementById('detail-device-img');
   const noImgFallback = document.getElementById('detail-no-image-fallback');
 
-  if (isVisitorCase) {
-    /* 觀眾病例：完全獨立，只用 detail-visitor-img 顯示觀眾照片，不動前面四位的滑桿元件 */
-    baseComparisonGroup.classList.add('hidden');
-    const vUrl = resolveVisitorPhotoSrc(data);
+  applyDetailLeftMode(isVisitorCase);
 
+  if (isVisitorCase) {
+    const vUrl = resolveVisitorPhotoSrc(data);
     visitorImg.onerror = function() {
       visitorImg.classList.add('hidden');
       if (noImgFallback) noImgFallback.classList.remove('hidden');
@@ -2227,11 +2277,6 @@ function showDetail(id) {
       if (noImgFallback) noImgFallback.classList.remove('hidden');
     }
   } else {
-    /* 原始四位委託人：維持原本左右滑桿對比 */
-    visitorImg.src = '';
-    visitorImg.classList.add('hidden');
-    baseComparisonGroup.classList.remove('hidden');
-
     const pUrl = formatImageSrc(data.imageUrl);
     const dUrl = formatImageSrc(data.deviceImageUrl || data.imageUrl);
 
@@ -2254,18 +2299,6 @@ function showDetail(id) {
       deviceImg.classList.add('hidden');
       if (noImgFallback) noImgFallback.classList.remove('hidden');
     }
-
-    const slider = document.getElementById('comparison-slider');
-    const clipWrapper = document.getElementById('slider-clip-wrapper');
-    const sliderLine = document.getElementById('slider-line');
-    const badgePrincipal = document.getElementById('badge-principal');
-    const badgeDevice = document.getElementById('badge-device');
-
-    slider.value = 50;
-    clipWrapper.style.width = '50%';
-    sliderLine.style.left = '50%';
-    badgePrincipal.className = "absolute bottom-2.5 left-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive";
-    badgeDevice.className = "absolute bottom-2.5 right-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive";
   }
 
   const sigImg = document.getElementById('detail-signature-img');
