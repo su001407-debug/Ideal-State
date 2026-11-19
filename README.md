@@ -396,30 +396,247 @@ body {
 
   <!-- 首頁 -->
 
-  <main id="portal-view" class="space-y-8">
+  <main id="portal-view" class="space-y-14">
 
-    <div class="flex justify-between items-end border-b border-gray-800/60 pb-3 gap-4">
+    <!-- 原始四位委託人檔案目錄 -->
 
-      <div>
-        <h2 class="text-lg font-bold text-white tracking-wide">
-          委託人檔案目錄
-        </h2>
+    <section class="space-y-8">
 
-        <p class="text-xs text-gray-500">
-          點擊個案卡片，檢視完整「臨床診斷報告與生命累積呼吸數據」
-        </p>
+      <div class="flex justify-between items-end border-b border-gray-800/60 pb-3 gap-4">
+
+        <div>
+          <h2 class="text-lg font-bold text-white tracking-wide">
+            委託人檔案目錄
+          </h2>
+
+          <p class="text-xs text-gray-500">
+            點擊個案卡片，檢視完整「臨床診斷報告與生命累積呼吸數據」
+          </p>
+        </div>
+
+        <span class="text-xs text-gray-600 font-mono shrink-0">
+          TOTAL: 04 CASES
+        </span>
+
       </div>
 
-      <span class="text-xs text-gray-600 font-mono shrink-0">
-        TOTAL: 04 CASES
-      </span>
+      <div
+        id="cards-container"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+      ></div>
 
-    </div>
+    </section>
 
-    <div
-      id="cards-container"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-    ></div>
+    <!-- 現場觀眾病例獨立區塊 -->
+
+    <section class="border-t border-gray-800/80 pt-12 space-y-8">
+
+      <div class="flex justify-between items-end border-b border-gray-800/60 pb-3 gap-4">
+
+        <div>
+          <span class="text-[10px] font-mono text-emerald-400 tracking-widest block mb-1">
+            PUBLIC ARCHIVE EXTENSION / 現場觀眾延伸檔案
+          </span>
+
+          <h2 class="text-lg font-bold text-white tracking-wide">
+            現場觀眾病例檔案目錄
+          </h2>
+
+          <p class="text-xs text-gray-500">
+            獨立收錄展覽現場觀眾提交之個人焦慮病例與診斷紀錄
+          </p>
+        </div>
+
+        <span id="visitor-total-label" class="text-xs text-gray-600 font-mono shrink-0">
+          VISITOR CASES: 00
+        </span>
+
+      </div>
+
+      <div
+        id="visitor-cards-container"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+      ></div>
+
+      <!-- 現場觀眾病例登錄表單 -->
+
+      <div id="visitor-case-section" class="glass-card rounded-xl p-6 md:p-8 space-y-6">
+
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-gray-800/80 pb-4 gap-2">
+
+          <div>
+            <span class="text-[10px] font-mono text-emerald-400 tracking-widest block mb-1">
+              VISITOR INTAKE TERMINAL / 現場病例登錄
+            </span>
+
+            <h3 class="text-base font-bold text-white tracking-wide">
+              書寫你的病例檔案
+            </h3>
+
+            <p class="text-xs text-gray-500 mt-1">
+              若你也有類似的空閒罪惡感或生產力焦慮經歷，只需填寫焦慮自白即可建立病例（其餘欄位皆可選填）
+            </p>
+          </div>
+
+          <span id="next-case-preview" class="text-xs font-mono text-emerald-400 shrink-0">
+            NEXT ID: CASE #05
+          </span>
+
+        </div>
+
+        <form id="visitor-case-form" class="space-y-5 font-mono text-xs">
+
+          <div>
+            <label for="visitor-statement" class="block text-[10px] text-emerald-400 font-bold mb-1.5">
+              本體焦慮自白紀錄 (ANXIETY STATEMENT) * 必填
+            </label>
+            <textarea
+              id="visitor-statement"
+              rows="4"
+              required
+              placeholder="寫下你面對空閒、休息或沒有產出時的真實感受與焦慮自白..."
+              class="w-full bg-gray-950/90 border border-gray-800 focus:border-emerald-500 rounded px-3.5 py-2.5 text-xs font-sans text-white placeholder-gray-600 outline-none transition-colors leading-relaxed"
+            ></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+            <div>
+              <label for="visitor-name" class="block text-[10px] text-gray-400 mb-1.5">
+                委託人姓名 / 代號 (選填)
+              </label>
+              <input
+                type="text"
+                id="visitor-name"
+                placeholder="例如：王Ｏ明（留空自動編號）"
+                class="w-full bg-gray-950/90 border border-gray-800 focus:border-emerald-500 rounded px-3.5 py-2.5 text-xs text-white placeholder-gray-600 outline-none transition-colors"
+              >
+            </div>
+
+            <div>
+              <label for="visitor-birth" class="block text-[10px] text-gray-400 mb-1.5">
+                出生日期 (選填，用於計算呼吸數)
+              </label>
+              <input
+                type="date"
+                id="visitor-birth"
+                class="w-full bg-gray-950/90 border border-gray-800 focus:border-emerald-500 rounded px-3.5 py-2.5 text-xs text-white outline-none transition-colors"
+              >
+            </div>
+
+            <div>
+              <label for="visitor-anxiety" class="block text-[10px] text-gray-400 mb-1.5">
+                焦慮指數 (選填)
+              </label>
+              <input
+                type="text"
+                id="visitor-anxiety"
+                placeholder="例如：89.5% (極高)"
+                class="w-full bg-gray-950/90 border border-gray-800 focus:border-emerald-500 rounded px-3.5 py-2.5 text-xs text-white placeholder-gray-600 outline-none transition-colors"
+              >
+            </div>
+
+          </div>
+
+          <!-- 手機照相建檔區（選填） -->
+
+          <div class="bg-gray-950/70 border border-gray-800/80 rounded-lg p-4 space-y-3">
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+
+              <div>
+                <span class="block text-[10px] text-gray-300 font-bold">
+                  現場本體影像拍攝 / 選取照片 (選填 CAMERA CAPTURE)
+                </span>
+                <span class="block text-[10px] text-gray-500 mt-0.5 font-sans">
+                  手機點擊可直接開啟相機自拍建檔，系統將自動轉為黑白臨床掃描影像
+                </span>
+              </div>
+
+              <div class="flex items-center gap-2 shrink-0">
+
+                <label
+                  for="visitor-camera-input"
+                  class="btn-white px-4 py-2 rounded text-xs inline-flex items-center gap-2 cursor-pointer"
+                >
+                  <span>📷</span>
+                  <span>開啟相機拍照 / 選取照片</span>
+                </label>
+
+                <input
+                  type="file"
+                  id="visitor-camera-input"
+                  accept="image/*"
+                  capture="user"
+                  class="hidden"
+                >
+
+                <button
+                  type="button"
+                  id="clear-photo-btn"
+                  onclick="clearCapturedPhoto()"
+                  class="hidden px-3 py-2 rounded border border-gray-700 text-gray-400 hover:text-white text-xs"
+                >
+                  清除照片
+                </button>
+
+              </div>
+
+            </div>
+
+            <div id="photo-preview-box" class="hidden pt-2 border-t border-gray-800/80 flex items-center gap-4">
+
+              <img
+                id="photo-preview-img"
+                src=""
+                alt="Captured Preview"
+                class="w-16 h-20 object-cover rounded border border-emerald-500/40 grayscale contrast-125"
+              >
+
+              <div class="text-[10px] space-y-1">
+                <span class="text-emerald-400 font-bold block">
+                  ✓ 影像已完成臨床掃描壓縮
+                </span>
+                <span class="text-gray-500 block font-sans">
+                  送出病例後將同步顯示於現場觀眾檔案目錄與診斷視窗
+                </span>
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-1">
+
+            <span id="visitor-form-feedback" class="text-[11px] text-emerald-400 min-h-[16px]"></span>
+
+            <div class="flex items-center gap-3 shrink-0">
+
+              <button
+                type="button"
+                onclick="resetVisitorCases()"
+                class="px-4 py-2.5 rounded border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors text-xs"
+              >
+                重設觀眾病例
+              </button>
+
+              <button
+                type="submit"
+                class="btn-neon px-5 py-2.5 rounded text-xs inline-flex items-center gap-2 cursor-pointer"
+              >
+                <span>建立並加入觀眾病例</span>
+                <span>→</span>
+              </button>
+
+            </div>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </section>
 
   </main>
 
@@ -473,6 +690,28 @@ body {
           id="detail-slider-container"
           class="w-full h-full min-h-[360px] md:min-h-full bg-gray-950 rounded-lg overflow-hidden border border-gray-800 relative select-none group"
         >
+
+          <div
+            id="detail-no-image-fallback"
+            class="hidden absolute inset-0 flex flex-col items-center justify-center space-y-2 text-gray-700 z-0"
+          >
+            <svg
+              class="w-12 h-12 stroke-gray-700"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            <span class="text-[10px] font-mono text-gray-600">
+              NO SCAN DATA
+            </span>
+          </div>
 
           <img
             id="detail-device-img"
@@ -751,9 +990,9 @@ body {
 </div>
 
 <script>
-/* 個案資料 */
+/* 原始四位個案資料 */
 
-const PARTICIPANTS = [
+const BASE_PARTICIPANTS = [
   {
     id: "01",
     name: "蘇Ｏ齊",
@@ -804,7 +1043,56 @@ const PARTICIPANTS = [
   }
 ];
 
+const VISITOR_STORAGE_KEY = "IDEAL_STATE_VISITOR_CASES_2026";
+let capturedPhotoDataUrl = "";
+let VISITOR_PARTICIPANTS = loadVisitorCases();
 let breathTimer = null;
+
+function formatImageSrc(url) {
+  if (!url) return "";
+  if (url.startsWith("data:")) return url;
+  return `${url}?v=${Date.now()}`;
+}
+
+function loadVisitorCases() {
+  try {
+    const raw = localStorage.getItem(VISITOR_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function saveVisitorCases(cases) {
+  try {
+    localStorage.setItem(VISITOR_STORAGE_KEY, JSON.stringify(cases));
+  } catch (err) {
+    // 忽略儲存空間限制錯誤
+  }
+}
+
+function getAllParticipants() {
+  return [...BASE_PARTICIPANTS, ...VISITOR_PARTICIPANTS];
+}
+
+/* 更新觀眾案件總數與下一組編號預覽 */
+
+function updateCaseCountersUI() {
+  const visitorTotalEl = document.getElementById('visitor-total-label');
+  const nextIdEl = document.getElementById('next-case-preview');
+  const visitorCountStr = String(VISITOR_PARTICIPANTS.length).padStart(2, '0');
+  const nextIdStr = String(BASE_PARTICIPANTS.length + VISITOR_PARTICIPANTS.length + 1).padStart(2, '0');
+
+  if (visitorTotalEl) {
+    visitorTotalEl.innerText = `VISITOR CASES: ${visitorCountStr}`;
+  }
+
+  if (nextIdEl) {
+    nextIdEl.innerText = `NEXT ID: CASE #${nextIdStr}`;
+  }
+}
 
 /* 作品理念 */
 
@@ -881,7 +1169,7 @@ function calculateLifetimeBreaths(birthDateStr) {
 
   const diffInSeconds = (now - birthDate) / 1000;
 
-  return Math.floor(diffInSeconds * 0.25);
+  return Math.max(0, Math.floor(diffInSeconds * 0.25));
 }
 
 function startBreathCounter(birthDateStr) {
@@ -948,104 +1236,251 @@ function initComparisonSlider() {
   updateImgDimensions();
 }
 
-/* 首頁卡片 */
+/* 單張卡片模板 */
 
-function renderPortalCards() {
-  const container = document.getElementById('cards-container');
+function buildCaseCardHTML(p) {
+  const imgSrc = formatImageSrc(p.imageUrl);
+  const deviceImgSrc = formatImageSrc(p.deviceImageUrl || p.imageUrl);
 
-  container.innerHTML = PARTICIPANTS.map(p => {
-    const imgSrc = p.imageUrl
-      ? `${p.imageUrl}?v=${Date.now()}`
-      : '';
+  return `
+    <div
+      onclick="showDetail('${p.id}')"
+      class="glass-card rounded-xl overflow-hidden cursor-pointer flex flex-col justify-between relative group"
+    >
 
-    const deviceImgSrc = (p.deviceImageUrl || p.imageUrl)
-      ? `${p.deviceImageUrl || p.imageUrl}?v=${Date.now()}`
-      : '';
+      <div class="aspect-[3/4] w-full bg-gray-950 relative overflow-hidden flex items-center justify-center">
 
-    return `
-      <div
-        onclick="showDetail('${p.id}')"
-        class="glass-card rounded-xl overflow-hidden cursor-pointer flex flex-col justify-between relative group"
-      >
+        <div class="absolute top-3 left-3 pointer-events-none z-30">
 
-        <div class="aspect-[3/4] w-full bg-gray-950 relative overflow-hidden flex items-center justify-center">
+          <span class="text-xs font-mono text-white tracking-wider font-bold bg-black/70 backdrop-blur-md px-2.5 py-1 rounded shadow-lg inline-block transition-all duration-300 group-hover:bg-transparent group-hover:backdrop-blur-none group-hover:shadow-none mobile-auto-bg-fade">
+            CASE #${p.id}
+          </span>
 
-          <div class="absolute top-3 left-3 pointer-events-none z-30">
+        </div>
 
-            <span class="text-xs font-mono text-white tracking-wider font-bold bg-black/70 backdrop-blur-md px-2.5 py-1 rounded shadow-lg inline-block transition-all duration-300 group-hover:bg-transparent group-hover:backdrop-blur-none group-hover:shadow-none mobile-auto-bg-fade">
-              CASE #${p.id}
-            </span>
+        ${
+          p.imageUrl
+            ? `
+              <img
+                src="${imgSrc}"
+                alt="${p.name}"
+                class="w-full h-full object-cover grayscale contrast-125 group-hover:scale-105 transition-all duration-500 absolute inset-0 z-0"
+              >
 
-          </div>
+              <img
+                src="${deviceImgSrc}"
+                alt="Proxy Device"
+                class="w-full h-full object-cover grayscale contrast-125 opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10"
+              >
+            `
+            : `
+              <div class="flex flex-col items-center space-y-2 text-gray-700">
 
-          ${
-            p.imageUrl
-              ? `
-                <img
-                  src="${imgSrc}"
-                  alt="${p.name}"
-                  class="w-full h-full object-cover grayscale contrast-125 group-hover:scale-105 transition-all duration-500 absolute inset-0 z-0"
+                <svg
+                  class="w-12 h-12 stroke-gray-700"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
 
-                <img
-                  src="${deviceImgSrc}"
-                  alt="Proxy Device"
-                  class="w-full h-full object-cover grayscale contrast-125 opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10"
-                >
-              `
-              : `
-                <div class="flex flex-col items-center space-y-2 text-gray-700">
+                <span class="text-[10px] font-mono text-gray-600">
+                  NO SCAN DATA
+                </span>
 
-                  <svg
-                    class="w-12 h-12 stroke-gray-700"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="1.5"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
+              </div>
+            `
+        }
 
-                  <span class="text-[10px] font-mono text-gray-600">
-                    NO SCAN DATA
-                  </span>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none z-20"></div>
 
-                </div>
-              `
-          }
+        <div class="absolute bottom-14 left-4 right-4 space-y-0.5 pointer-events-none z-30">
 
-          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none z-20"></div>
+          <h3 class="text-lg font-bold text-white tracking-wide">
+            ${p.name}
+          </h3>
 
-          <div class="absolute bottom-14 left-4 right-4 space-y-0.5 pointer-events-none z-30">
+          <p class="text-xs text-gray-300 font-mono">
+            ${p.role}
+          </p>
 
-            <h3 class="text-lg font-bold text-white tracking-wide">
-              ${p.name}
-            </h3>
+        </div>
 
-            <p class="text-xs text-gray-300 font-mono">
-              ${p.role}
-            </p>
+        <div class="absolute bottom-3 left-3 right-3 z-30">
 
-          </div>
-
-          <div class="absolute bottom-3 left-3 right-3 z-30">
-
-            <button class="btn-neon w-full py-2 text-xs rounded shadow-lg flex items-center justify-center space-x-1">
-              <span>檢視個案診斷</span>
-              <span>→</span>
-            </button>
-
-          </div>
+          <button class="btn-neon w-full py-2 text-xs rounded shadow-lg flex items-center justify-center space-x-1">
+            <span>檢視個案診斷</span>
+            <span>→</span>
+          </button>
 
         </div>
 
       </div>
-    `;
-  }).join('');
+
+    </div>
+  `;
+}
+
+/* 渲染原始四位卡片與現場觀眾獨立卡片 */
+
+function renderPortalCards() {
+  const baseContainer = document.getElementById('cards-container');
+  const visitorContainer = document.getElementById('visitor-cards-container');
+
+  if (baseContainer) {
+    baseContainer.innerHTML = BASE_PARTICIPANTS.map(buildCaseCardHTML).join('');
+  }
+
+  if (visitorContainer) {
+    if (VISITOR_PARTICIPANTS.length === 0) {
+      visitorContainer.innerHTML = `
+        <div class="col-span-full bg-gray-950/60 border border-dashed border-gray-800 rounded-xl p-8 text-center font-mono space-y-1.5">
+          <span class="text-xs text-gray-400 block">
+            [STANDBY] 尚未收錄現場觀眾病例檔案
+          </span>
+          <span class="text-[11px] text-gray-600 font-sans block">
+            請於下方「書寫你的病例檔案」登錄你的焦慮自白，建立後將顯示於此獨立檔案區
+          </span>
+        </div>
+      `;
+    } else {
+      visitorContainer.innerHTML = VISITOR_PARTICIPANTS.map(buildCaseCardHTML).join('');
+    }
+  }
+
+  updateCaseCountersUI();
+}
+
+/* 手機照相與影像壓縮處理 */
+
+function compressCapturedImage(file, callback) {
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const img = new Image();
+    img.onload = function() {
+      const maxDim = 720;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.78);
+      callback(compressedDataUrl);
+    };
+    img.src = event.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearCapturedPhoto() {
+  capturedPhotoDataUrl = "";
+  const cameraInput = document.getElementById('visitor-camera-input');
+  const previewBox = document.getElementById('photo-preview-box');
+  const previewImg = document.getElementById('photo-preview-img');
+  const clearBtn = document.getElementById('clear-photo-btn');
+
+  if (cameraInput) cameraInput.value = "";
+  if (previewImg) previewImg.src = "";
+  if (previewBox) previewBox.classList.add('hidden');
+  if (clearBtn) clearBtn.classList.add('hidden');
+}
+
+/* 現場觀眾病例登錄處理 */
+
+function initVisitorForm() {
+  const form = document.getElementById('visitor-case-form');
+  const feedback = document.getElementById('visitor-form-feedback');
+  const cameraInput = document.getElementById('visitor-camera-input');
+
+  if (cameraInput) {
+    cameraInput.addEventListener('change', function(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      compressCapturedImage(file, function(dataUrl) {
+        capturedPhotoDataUrl = dataUrl;
+        const previewBox = document.getElementById('photo-preview-box');
+        const previewImg = document.getElementById('photo-preview-img');
+        const clearBtn = document.getElementById('clear-photo-btn');
+
+        if (previewImg) previewImg.src = dataUrl;
+        if (previewBox) previewBox.classList.remove('hidden');
+        if (clearBtn) clearBtn.classList.remove('hidden');
+      });
+    });
+  }
+
+  if (!form) return;
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const statementInput = document.getElementById('visitor-statement').value.trim();
+    const nameInput = document.getElementById('visitor-name').value.trim();
+    const birthInput = document.getElementById('visitor-birth').value;
+    const anxietyInput = document.getElementById('visitor-anxiety').value.trim();
+
+    if (!statementInput) {
+      feedback.textContent = "請填寫本體焦慮自白紀錄。";
+      return;
+    }
+
+    const nextNum = BASE_PARTICIPANTS.length + VISITOR_PARTICIPANTS.length + 1;
+    const nextId = String(nextNum).padStart(2, '0');
+    const resolvedName = nameInput || `現場委託人 #${nextId}`;
+    const resolvedBirth = birthInput || "2005-01-01";
+
+    const newCase = {
+      id: nextId,
+      name: resolvedName,
+      role: `現場延伸病例 ${nextId} 號`,
+      target: `${resolvedName} (本體)`,
+      anxiety: anxietyInput || "85.0% (現場登錄)",
+      birthDate: resolvedBirth,
+      imageUrl: capturedPhotoDataUrl,
+      deviceImageUrl: capturedPhotoDataUrl,
+      signatureUrl: "",
+      statement: statementInput
+    };
+
+    VISITOR_PARTICIPANTS = [...VISITOR_PARTICIPANTS, newCase];
+    saveVisitorCases(VISITOR_PARTICIPANTS);
+
+    renderPortalCards();
+    form.reset();
+    clearCapturedPhoto();
+    feedback.textContent = `已建立病例 CASE #${nextId}（${resolvedName}），並加入「現場觀眾病例檔案目錄」。`;
+  });
+}
+
+function resetVisitorCases() {
+  VISITOR_PARTICIPANTS = [];
+  saveVisitorCases([]);
+  renderPortalCards();
+  const feedback = document.getElementById('visitor-form-feedback');
+  if (feedback) {
+    feedback.textContent = "已重設現場觀眾病例檔案。";
+  }
 }
 
 /* 頁面切換 */
@@ -1062,7 +1497,8 @@ function showPortal() {
 }
 
 function showDetail(id) {
-  const data = PARTICIPANTS.find(p => p.id === id) || PARTICIPANTS[0];
+  const allCases = getAllParticipants();
+  const data = allCases.find(p => p.id === id) || BASE_PARTICIPANTS[0];
 
   document.getElementById('header-output-box').style.display = 'none';
 
@@ -1078,23 +1514,36 @@ function showDetail(id) {
 
   const principalImg = document.getElementById('detail-principal-img');
   const deviceImg = document.getElementById('detail-device-img');
+  const noImgFallback = document.getElementById('detail-no-image-fallback');
+  const clipWrapper = document.getElementById('slider-clip-wrapper');
+  const sliderLine = document.getElementById('slider-line');
 
-  const pUrl = data.imageUrl
-    ? `${data.imageUrl}?v=${Date.now()}`
-    : '';
+  const pUrl = formatImageSrc(data.imageUrl);
+  const dUrl = formatImageSrc(data.deviceImageUrl || data.imageUrl);
 
-  const dUrl = data.deviceImageUrl
-    ? `${data.deviceImageUrl}?v=${Date.now()}`
-    : pUrl;
-
-  principalImg.src = pUrl;
-  deviceImg.src = dUrl;
+  if (pUrl) {
+    principalImg.src = pUrl;
+    deviceImg.src = dUrl;
+    principalImg.classList.remove('hidden');
+    deviceImg.classList.remove('hidden');
+    clipWrapper.classList.remove('hidden');
+    sliderLine.classList.remove('hidden');
+    if (noImgFallback) noImgFallback.classList.add('hidden');
+  } else {
+    principalImg.src = '';
+    deviceImg.src = '';
+    principalImg.classList.add('hidden');
+    deviceImg.classList.add('hidden');
+    clipWrapper.classList.add('hidden');
+    sliderLine.classList.add('hidden');
+    if (noImgFallback) noImgFallback.classList.remove('hidden');
+  }
 
   // 簽名圖片處理
   const sigImg = document.getElementById('detail-signature-img');
   const sigPlaceholder = document.getElementById('detail-signature-placeholder');
   if (data.signatureUrl) {
-    sigImg.src = `${data.signatureUrl}?v=${Date.now()}`;
+    sigImg.src = formatImageSrc(data.signatureUrl);
     sigImg.classList.remove('hidden');
     sigPlaceholder.classList.add('hidden');
   } else {
@@ -1104,8 +1553,8 @@ function showDetail(id) {
   }
 
   document.getElementById('comparison-slider').value = 50;
-  document.getElementById('slider-clip-wrapper').style.width = '50%';
-  document.getElementById('slider-line').style.left = '50%';
+  clipWrapper.style.width = '50%';
+  sliderLine.style.left = '50%';
 
   document.getElementById('badge-principal').className =
     "absolute bottom-2.5 left-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none badge-inactive";
@@ -1132,6 +1581,7 @@ window.addEventListener('DOMContentLoaded', () => {
   renderPortalCards();
   initComparisonSlider();
   startOutputFluctuationWithPause();
+  initVisitorForm();
 
   const urlParams = new URLSearchParams(window.location.search);
   const targetId = urlParams.get('id');
