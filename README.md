@@ -1156,9 +1156,15 @@ let VISITOR_PARTICIPANTS = loadLocalVisitorCases();
 let breathTimer = null;
 
 function formatImageSrc(url) {
-  if (!url) return "";
-  if (url.startsWith("data:")) return url;
-  return `${url}?v=${Date.now()}`;
+  if (!url || typeof url !== "string") return "";
+  if (url.startsWith("data:image/")) {
+    if (url.length < 120 || !url.includes(",")) return "";
+    return url;
+  }
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return `${url}?v=${Date.now()}`;
+  }
+  return "";
 }
 
 function loadLocalVisitorCases() {
@@ -1176,7 +1182,7 @@ function saveLocalVisitorCases(cases) {
   try {
     localStorage.setItem(VISITOR_STORAGE_KEY, JSON.stringify(cases));
   } catch (err) {
-    // 忽略本機快取空間限制
+    // 若容量不足則略過本機快取，以雲端為主
   }
 }
 
@@ -1490,17 +1496,19 @@ function buildCaseCardHTML(p, isVisitor = false) {
         </div>
 
         ${
-          p.imageUrl
+          imgSrc
             ? `
               <img
                 src="${imgSrc}"
                 alt="${p.name}"
+                onerror="this.style.display='none'"
                 class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 absolute inset-0 z-0"
               >
 
               <img
                 src="${deviceImgSrc}"
                 alt="Proxy Device"
+                onerror="this.style.display='none'"
                 class="w-full h-full object-cover opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10"
               >
             `
@@ -1741,7 +1749,7 @@ function fallbackBackgroundCutout(img, width, height) {
   }
 
   applyClinicalMonochromeTone(ctx, width, height, mData);
-  return canvas.toDataURL('image/jpeg', 0.82);
+  return canvas.toDataURL('image/jpeg', 0.62);
 }
 
 function processPortraitCutoutAndTone(file) {
@@ -1750,7 +1758,7 @@ function processPortraitCutoutAndTone(file) {
     reader.onload = function(event) {
       const img = new Image();
       img.onload = async function() {
-        const maxDim = 640;
+        const maxDim = 420;
         let width = img.width;
         let height = img.height;
 
@@ -1799,7 +1807,7 @@ function processPortraitCutoutAndTone(file) {
 
             applyClinicalMonochromeTone(outCtx, width, height, alphaMaskData);
 
-            resolve(outCanvas.toDataURL('image/jpeg', 0.82));
+            resolve(outCanvas.toDataURL('image/jpeg', 0.62));
           });
 
           const inputCanvas = document.createElement('canvas');
@@ -1847,12 +1855,12 @@ function rebuildOutputPhotoWithPrivacyOption() {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       if (typeof ctx.filter !== 'undefined') {
-        ctx.filter = 'blur(14px)';
+        ctx.filter = 'blur(12px)';
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         ctx.filter = 'none';
       } else {
-        const smallW = Math.max(18, Math.round(canvas.width * 0.06));
-        const smallH = Math.max(24, Math.round(canvas.height * 0.06));
+        const smallW = Math.max(16, Math.round(canvas.width * 0.06));
+        const smallH = Math.max(20, Math.round(canvas.height * 0.06));
         const tmpCanvas = document.createElement('canvas');
         tmpCanvas.width = smallW;
         tmpCanvas.height = smallH;
@@ -1863,7 +1871,7 @@ function rebuildOutputPhotoWithPrivacyOption() {
         ctx.drawImage(tmpCanvas, 0, 0, smallW, smallH, 0, 0, canvas.width, canvas.height);
       }
 
-      capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.80);
+      capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.60);
       updatePhotoPreviewUI();
       resolve(capturedPhotoDataUrl);
     };
@@ -2227,6 +2235,12 @@ function showDetail(id) {
 
   const pUrl = formatImageSrc(data.imageUrl);
   const dUrl = formatImageSrc(data.deviceImageUrl || data.imageUrl);
+
+  principalImg.onerror = function() {
+    principalImg.classList.add('hidden');
+    deviceImg.classList.add('hidden');
+    if (noImgFallback) noImgFallback.classList.remove('hidden');
+  };
 
   if (pUrl) {
     principalImg.src = pUrl;
