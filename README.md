@@ -1847,15 +1847,18 @@ function applyPrivacyBlurToDataUrl(sourceDataUrl) {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       if (typeof ctx.filter !== 'undefined') {
-        ctx.filter = 'blur(8px)';
+        ctx.filter = 'blur(24px)';
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 0.75;
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         ctx.globalAlpha = 0.45;
+        ctx.filter = 'blur(32px)';
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         ctx.globalAlpha = 1;
         ctx.filter = 'none';
       } else {
-        const smallW = Math.max(64, Math.round(canvas.width * 0.25));
-        const smallH = Math.max(80, Math.round(canvas.height * 0.25));
+        const smallW = Math.max(24, Math.round(canvas.width * 0.08));
+        const smallH = Math.max(30, Math.round(canvas.height * 0.08));
         const tmpCanvas = document.createElement('canvas');
         tmpCanvas.width = smallW;
         tmpCanvas.height = smallH;
