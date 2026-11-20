@@ -672,9 +672,6 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
                 <span id="photo-preview-badge" class="text-emerald-400 font-bold block">
                   ✓ 影像已完成黑白曝光調整
                 </span>
-                <span class="text-gray-500 block font-sans leading-relaxed">
-                  已套用自然黑白灰階與曝光微調；可隨時切換上方「隱私模糊保護」確認遮蔽效果
-                </span>
               </div>
 
             </div>
@@ -1846,33 +1843,30 @@ function applyPrivacyBlurToDataUrl(sourceDataUrl) {
       ctx.fillStyle = '#08090a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      if (typeof ctx.filter !== 'undefined') {
-        ctx.filter = 'blur(24px)';
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        ctx.globalAlpha = 0.75;
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        ctx.globalAlpha = 0.45;
-        ctx.filter = 'blur(32px)';
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        ctx.globalAlpha = 1;
-        ctx.filter = 'none';
-      } else {
-        const smallW = Math.max(24, Math.round(canvas.width * 0.08));
-        const smallH = Math.max(30, Math.round(canvas.height * 0.08));
-        const tmpCanvas = document.createElement('canvas');
-        tmpCanvas.width = smallW;
-        tmpCanvas.height = smallH;
-        const tmpCtx = tmpCanvas.getContext('2d');
-        tmpCtx.imageSmoothingEnabled = true;
-        tmpCtx.imageSmoothingQuality = 'high';
-        tmpCtx.drawImage(img, 0, 0, smallW, smallH);
+      // 依影像短邊計算馬賽克方塊大小，確保高解析度照片也能產生足夠粗大的方塊
+      const shortSide = Math.min(canvas.width, canvas.height);
+      const blockSize = Math.max(14, Math.round(shortSide / 24));
+      const cols = Math.max(1, Math.ceil(canvas.width / blockSize));
+      const rows = Math.max(1, Math.ceil(canvas.height / blockSize));
 
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(tmpCanvas, 0, 0, smallW, smallH, 0, 0, canvas.width, canvas.height);
-      }
+      const mosaicCanvas = document.createElement('canvas');
+      mosaicCanvas.width = cols;
+      mosaicCanvas.height = rows;
+      const mosaicCtx = mosaicCanvas.getContext('2d');
+      mosaicCtx.imageSmoothingEnabled = true;
+      mosaicCtx.imageSmoothingQuality = 'medium';
+      mosaicCtx.drawImage(img, 0, 0, cols, rows);
 
-      resolve(canvas.toDataURL('image/jpeg', 0.82));
+      // 關閉平滑插值，將縮小的方塊像素放大成硬邊馬賽克
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+      ctx.mozImageSmoothingEnabled = false;
+      ctx.webkitImageSmoothingEnabled = false;
+      ctx.msImageSmoothingEnabled = false;
+      ctx.drawImage(mosaicCanvas, 0, 0, cols, rows, 0, 0, canvas.width, canvas.height);
+      ctx.restore();
+
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
     };
     img.onerror = function() {
       resolve(sourceDataUrl);
@@ -1917,8 +1911,25 @@ function updatePhotoPreviewUI() {
 
   if (previewBadge) {
     previewBadge.innerText = isPrivacyBlurEnabled
-      ? "✓ 影像已完成黑白曝光＋高解析柔焦模糊"
+      ? "✓ 隱私保護已開啟"
       : "✓ 影像已完成黑白曝光調整";
+  }
+}
+
+function syncPrivacyBlurButtonUI() {
+  const btn = document.getElementById('privacy-blur-toggle');
+  const indicator = document.getElementById('privacy-blur-indicator');
+  const label = document.getElementById('privacy-blur-label');
+  if (!btn || !indicator || !label) return;
+
+  if (isPrivacyBlurEnabled) {
+    btn.className = "w-full sm:w-auto px-3.5 py-2 rounded text-xs font-mono inline-flex items-center justify-center gap-2 border transition-all cursor-pointer bg-emerald-950/50 text-emerald-400 border-emerald-500/60";
+    indicator.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+    label.innerText = "隱私模糊保護：已開啟 (馬賽克遮蔽中)";
+  } else {
+    btn.className = "w-full sm:w-auto px-3.5 py-2 rounded text-xs font-mono inline-flex items-center justify-center gap-2 border transition-all cursor-pointer bg-gray-900/90 text-gray-300 border-gray-700 hover:border-emerald-500/60";
+    indicator.className = "w-2 h-2 rounded-full bg-gray-500";
+    label.innerText = "隱私模糊保護：關閉 (點擊套用馬賽克)";
   }
 }
 
