@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>理想狀態 - Archive Portal</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
@@ -268,6 +267,15 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
   content: none !important;
 }
 
+.archive-right-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
 .archive-header-actions {
   display: flex;
   flex-wrap: wrap;
@@ -336,6 +344,10 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
     justify-content: space-between;
   }
 
+  .archive-right-column {
+    align-self: stretch;
+  }
+
   .archive-header-actions {
     align-self: flex-end;
   }
@@ -349,6 +361,11 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
   .archive-subtitle {
     font-size: clamp(12px,3.5vw,16px);
   }
+
+  .archive-right-column {
+    align-items: flex-start;
+    width: 100%;
+  }
 }
 </style>
 </head>
@@ -357,16 +374,30 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
 <div class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-80 bg-emerald-950/20 blur-[130px] pointer-events-none rounded-full"></div>
 
+<!-- 系統訊息提示條 -->
+<div
+  id="system-toast"
+  class="hidden fixed bottom-5 right-5 z-50 max-w-sm bg-[#0d1117]/95 border border-emerald-500/50 text-gray-200 px-4 py-3 rounded-lg shadow-2xl font-mono text-xs flex items-center justify-between gap-3 backdrop-blur-md"
+>
+  <span id="system-toast-text" class="leading-relaxed">---</span>
+  <button
+    type="button"
+    onclick="hideToast()"
+    class="text-gray-400 hover:text-white font-bold px-1 shrink-0 cursor-pointer"
+  >
+    ✕
+  </button>
+</div>
+
 <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-14 relative z-10">
 
   <!-- HEADER -->
-
   <header class="border-b border-gray-700/70 pb-8 mb-12">
 
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-8 font-mono text-[10px] sm:text-xs tracking-[0.14em]">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6 font-mono text-[10px] sm:text-xs tracking-[0.14em]">
 
       <div class="flex items-center gap-2 text-emerald-400">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
         <span>
           SYSTEM RUNNING
           <span class="text-gray-600 mx-1">/</span>
@@ -398,25 +429,29 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
       </div>
 
-      <div class="archive-header-actions">
+      <div class="archive-right-column">
 
-        <button
-          id="header-concept-button"
-          onclick="openConceptModal()"
-          class="btn-white inline-flex items-center justify-center gap-2 shadow-sm font-mono"
-        >
-          <span>ⓘ</span>
-          <span>作品理念 (CONCEPT)</span>
-        </button>
+        <div class="archive-header-actions">
 
-        <div
-          id="header-output-box"
-          class="inline-flex items-center gap-3 font-mono text-gray-400 bg-gray-950/80 border border-gray-700/80"
-        >
-          <span class="text-gray-500">VALUABLE OUTPUT:</span>
-          <span id="header-output-counter" class="text-emerald-400 font-bold">
-            0.000 KG/H
-          </span>
+          <button
+            id="header-concept-button"
+            onclick="openConceptModal()"
+            class="btn-white inline-flex items-center justify-center gap-2 shadow-sm font-mono cursor-pointer"
+          >
+            <span>ⓘ</span>
+            <span>作品理念 (CONCEPT)</span>
+          </button>
+
+          <div
+            id="header-output-box"
+            class="inline-flex items-center gap-3 font-mono text-gray-400 bg-gray-950/80 border border-gray-700/80"
+          >
+            <span class="text-gray-500">VALUABLE OUTPUT:</span>
+            <span id="header-output-counter" class="text-emerald-400 font-bold">
+              0.000 KG/H
+            </span>
+          </div>
+
         </div>
 
       </div>
@@ -426,11 +461,9 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
   </header>
 
   <!-- 首頁 -->
-
   <main id="portal-view" class="space-y-14">
 
     <!-- 原始四位委託人檔案目錄 -->
-
     <section class="space-y-8">
 
       <div class="flex justify-between items-end border-b border-gray-800/60 pb-3 gap-4">
@@ -459,7 +492,6 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
     </section>
 
     <!-- 現場觀眾病例獨立區塊 -->
-
     <section class="border-t border-gray-800/80 pt-12 space-y-8">
 
       <div class="flex flex-wrap justify-between items-end border-b border-gray-800/60 pb-3 gap-3">
@@ -490,7 +522,6 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
       ></div>
 
       <!-- 現場觀眾病例登錄表單 -->
-
       <div id="visitor-case-section" class="glass-card rounded-xl p-5 sm:p-6 md:p-8 space-y-6 w-full overflow-hidden">
 
         <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-gray-800/80 pb-4 gap-2">
@@ -570,7 +601,6 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
           </div>
 
           <!-- 拍照與選取照片建檔區（選填） -->
-
           <div class="bg-gray-950/75 border border-gray-800/90 rounded-lg p-4 sm:p-5 space-y-4 w-full">
 
             <div class="space-y-1">
@@ -578,7 +608,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
                 現場本體影像拍攝 / 選取照片 (選填 CAMERA / PHOTO)
               </span>
               <span class="block text-[10px] text-gray-500 font-sans leading-relaxed">
-                點擊下方按鈕可拍照或從相簿選取照片，系統將自動去背並套用黑白灰階與微調曝光
+                點擊下方按鈕可拍照或從相簿選取照片，系統將自動套用黑白灰階與微調曝光，並可切換隱私模糊保護
               </span>
             </div>
 
@@ -617,7 +647,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
                 type="button"
                 id="clear-photo-btn"
                 onclick="clearCapturedPhoto()"
-                class="hidden w-full sm:w-auto px-3.5 py-2 rounded border border-red-900/60 bg-red-950/20 text-red-400 hover:bg-red-950/40 text-xs text-center"
+                class="hidden w-full sm:w-auto px-3.5 py-2 rounded border border-red-900/60 bg-red-950/20 text-red-400 hover:bg-red-950/40 text-xs text-center cursor-pointer"
               >
                 清除已選照片
               </button>
@@ -626,7 +656,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
             <div id="photo-processing-status" class="hidden text-[11px] text-emerald-400 flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span>正在進行人像去背、黑白灰階與曝光微調處理...</span>
+              <span>正在進行黑白灰階與曝光微調處理...</span>
             </div>
 
             <div id="photo-preview-box" class="hidden pt-3 border-t border-gray-800/80 flex items-center gap-4">
@@ -640,10 +670,10 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
               <div class="text-[10px] space-y-1 min-w-0">
                 <span id="photo-preview-badge" class="text-emerald-400 font-bold block">
-                  ✓ 影像已完成去背與黑白曝光調整
+                  ✓ 影像已完成黑白曝光調整
                 </span>
                 <span class="text-gray-500 block font-sans leading-relaxed">
-                  已套用純黑底色與自然黑白灰階；可隨時切換上方「隱私模糊保護」確認遮蔽效果
+                  已套用自然黑白灰階與曝光微調；可隨時切換上方「隱私模糊保護」確認遮蔽效果
                 </span>
               </div>
 
@@ -661,7 +691,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
                 type="button"
                 id="cancel-edit-btn"
                 onclick="cancelEditMode()"
-                class="hidden w-full sm:w-auto px-4 py-2.5 rounded border border-gray-700 text-gray-300 hover:text-white transition-colors text-xs text-center"
+                class="hidden w-full sm:w-auto px-4 py-2.5 rounded border border-gray-700 text-gray-300 hover:text-white transition-colors text-xs text-center cursor-pointer"
               >
                 取消修改
               </button>
@@ -688,14 +718,13 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
   </main>
 
   <!-- 個案詳情 -->
-
   <main id="detail-view" class="hidden space-y-6">
 
     <div class="flex flex-wrap items-center justify-between gap-3">
 
       <button
         onclick="showPortal()"
-        class="inline-flex items-center space-x-2 text-xs text-gray-300 hover:text-white transition-colors bg-gray-900/90 hover:bg-gray-800 px-4 py-2 rounded border border-gray-700"
+        class="inline-flex items-center space-x-2 text-xs text-gray-300 hover:text-white transition-colors bg-gray-900/90 hover:bg-gray-800 px-4 py-2 rounded border border-gray-700 cursor-pointer"
       >
         <span>←</span>
         <span>返回檔案目錄 (RETURN TO DIRECTORY)</span>
@@ -976,7 +1005,6 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
   </main>
 
   <!-- 作品理念視窗 -->
-
   <div
     id="concept-modal"
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md modal-backdrop hidden-modal"
@@ -1128,7 +1156,31 @@ const BASE_PARTICIPANTS = [
 
 const VISITOR_STORAGE_KEY = "IDEAL_STATE_VISITOR_CASES_2026";
 const DEVICE_TOKEN_KEY = "IDEAL_STATE_DEVICE_TOKEN_2026";
+const LEGACY_VISITOR_KEYS = [
+  "IDEAL_STATE_VISITOR_CASES_2026",
+  "IDEAL_STATE_VISITOR_PHOTOS_2026",
+  "VISITOR_CASES_BACKUP"
+];
 const EDIT_WINDOW_MS = 3 * 60 * 1000;
+
+let toastTimeout = null;
+
+function showToast(message) {
+  const toastEl = document.getElementById('system-toast');
+  const textEl = document.getElementById('system-toast-text');
+  if (!toastEl || !textEl) return;
+  textEl.innerText = message;
+  toastEl.classList.remove('hidden');
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    hideToast();
+  }, 4500);
+}
+
+function hideToast() {
+  const toastEl = document.getElementById('system-toast');
+  if (toastEl) toastEl.classList.add('hidden');
+}
 
 function hasFirebaseConfigured() {
   return Boolean(
@@ -1153,7 +1205,7 @@ function getDeviceToken() {
 const CURRENT_DEVICE_TOKEN = getDeviceToken();
 
 /* 影像狀態變數 */
-let rawCutoutBaseDataUrl = "";
+let rawMonochromeBaseDataUrl = "";
 let capturedPhotoDataUrl = "";
 let isPrivacyBlurEnabled = false;
 let editingCaseId = null;
@@ -1165,27 +1217,126 @@ let breathTimer = null;
 
 function formatImageSrc(url) {
   if (!url || typeof url !== "string") return "";
-  if (url.startsWith("data:image/")) {
-    if (url.length < 120 || !url.includes(",")) return "";
-    return url;
+  const trimmed = url.trim();
+  if (!trimmed) return "";
+  if (trimmed.startsWith("data:image/")) {
+    return trimmed;
   }
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return `${url}?v=${Date.now()}`;
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return `${trimmed}?v=${Date.now()}`;
   }
   return "";
 }
 
+function recoverVisitorCaseRecord(item) {
+  if (!item || typeof item !== "object") return null;
+  const recoveredImg =
+    formatImageSrc(item.imageUrl) ||
+    formatImageSrc(item.deviceImageUrl) ||
+    formatImageSrc(item.rawImageUrl) ||
+    formatImageSrc(item.photoUrl) ||
+    formatImageSrc(item.portraitUrl) ||
+    formatImageSrc(item.avatarUrl) ||
+    "";
+
+  return {
+    ...item,
+    imageUrl: recoveredImg,
+    rawImageUrl: recoveredImg,
+    deviceImageUrl: recoveredImg
+  };
+}
+
+function collectLegacyVisitorPhotosMap() {
+  const map = new Map();
+  LEGACY_VISITOR_KEYS.forEach(key => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        parsed.forEach(entry => {
+          if (!entry) return;
+          const idKey = String(entry.id || "");
+          const photo =
+            formatImageSrc(entry.imageUrl) ||
+            formatImageSrc(entry.deviceImageUrl) ||
+            formatImageSrc(entry.rawImageUrl) ||
+            formatImageSrc(entry.photoUrl) ||
+            "";
+          if (idKey && photo && !map.has(idKey)) {
+            map.set(idKey, photo);
+          }
+        });
+      } else if (parsed && typeof parsed === "object") {
+        Object.entries(parsed).forEach(([k, v]) => {
+          const photo = typeof v === "string" ? formatImageSrc(v) : resolveVisitorPhotoSrc(v);
+          if (k && photo && !map.has(String(k))) {
+            map.set(String(k), photo);
+          }
+        });
+      }
+    } catch (e) {
+      // 忽略單一舊鍵解析錯誤
+    }
+  });
+  return map;
+}
+
 function resolveVisitorPhotoSrc(p) {
   if (!p) return "";
-  return formatImageSrc(p.imageUrl || p.deviceImageUrl || p.rawImageUrl || "");
+  return (
+    formatImageSrc(p.imageUrl) ||
+    formatImageSrc(p.deviceImageUrl) ||
+    formatImageSrc(p.rawImageUrl) ||
+    formatImageSrc(p.photoUrl) ||
+    formatImageSrc(p.portraitUrl) ||
+    formatImageSrc(p.avatarUrl) ||
+    formatImageSrc(p.originalImageUrl) ||
+    formatImageSrc(p.backupImageUrl) ||
+    ""
+  );
 }
 
 function loadLocalVisitorCases() {
+  const photoMap = collectLegacyVisitorPhotosMap();
+  const allKeys = Array.from(new Set([...LEGACY_VISITOR_KEYS, ...Object.keys(localStorage)]));
+  allKeys.forEach(key => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        parsed.forEach(entry => {
+          if (!entry) return;
+          const idKey = String(entry.id || "");
+          const photo = resolveVisitorPhotoSrc(entry);
+          if (idKey && photo && !photoMap.has(idKey)) {
+            photoMap.set(idKey, photo);
+          }
+        });
+      }
+    } catch (e) {
+      // 略過非 JSON 項目
+    }
+  });
+
   try {
     const raw = localStorage.getItem(VISITOR_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map(rawEntry => {
+      const recovered = recoverVisitorCaseRecord(rawEntry);
+      if (!recovered) return null;
+      const fallbackPhoto = photoMap.get(String(recovered.id));
+      if (!resolveVisitorPhotoSrc(recovered) && fallbackPhoto) {
+        recovered.imageUrl = fallbackPhoto;
+        recovered.rawImageUrl = fallbackPhoto;
+        recovered.deviceImageUrl = fallbackPhoto;
+      }
+      return recovered;
+    }).filter(Boolean);
   } catch (err) {
     return [];
   }
@@ -1193,16 +1344,20 @@ function loadLocalVisitorCases() {
 
 function saveLocalVisitorCases(cases) {
   try {
-    localStorage.setItem(VISITOR_STORAGE_KEY, JSON.stringify(cases));
+    const normalized = Array.isArray(cases) ? cases.map(recoverVisitorCaseRecord).filter(Boolean) : [];
+    localStorage.setItem(VISITOR_STORAGE_KEY, JSON.stringify(normalized));
   } catch (err) {
     // 若容量不足則略過本機快取，以雲端為主
   }
 }
 
-/* 從 Firebase 雲端讀取所有觀眾病例 */
+/* 從 Firebase 雲端讀取所有觀眾病例並復原既有照片欄位 */
 async function fetchCloudVisitorCases() {
+  const localFallback = loadLocalVisitorCases();
+  const legacyPhotoMap = collectLegacyVisitorPhotosMap();
+
   if (!hasFirebaseConfigured()) {
-    return loadLocalVisitorCases();
+    return localFallback;
   }
 
   try {
@@ -1212,7 +1367,7 @@ async function fetchCloudVisitorCases() {
     if (!res.ok) throw new Error("Firebase fetch failed");
     const data = await res.json();
 
-    if (!data) return [];
+    if (!data) return localFallback;
 
     let list = [];
     if (Array.isArray(data)) {
@@ -1220,6 +1375,23 @@ async function fetchCloudVisitorCases() {
     } else if (typeof data === "object") {
       list = Object.values(data).filter(Boolean);
     }
+
+    const localById = new Map(localFallback.map(item => [String(item.id), item]));
+
+    list = list.map(rawItem => {
+      const recovered = recoverVisitorCaseRecord(rawItem);
+      if (!recovered) return null;
+      if (!resolveVisitorPhotoSrc(recovered)) {
+        const localMatch = localById.get(String(recovered.id));
+        const localPhoto = resolveVisitorPhotoSrc(localMatch) || legacyPhotoMap.get(String(recovered.id)) || "";
+        if (localPhoto) {
+          recovered.imageUrl = localPhoto;
+          recovered.rawImageUrl = localPhoto;
+          recovered.deviceImageUrl = localPhoto;
+        }
+      }
+      return recovered;
+    }).filter(Boolean);
 
     list.sort((a, b) => {
       const na = parseInt(a.id, 10) || 0;
@@ -1229,20 +1401,21 @@ async function fetchCloudVisitorCases() {
 
     return list;
   } catch (err) {
-    return loadLocalVisitorCases();
+    return localFallback;
   }
 }
 
 /* 將所有觀眾病例同步寫入 Firebase 雲端 */
 async function syncVisitorCasesToCloud(cases) {
-  saveLocalVisitorCases(cases);
+  const normalized = Array.isArray(cases) ? cases.map(recoverVisitorCaseRecord).filter(Boolean) : [];
+  saveLocalVisitorCases(normalized);
 
   if (!hasFirebaseConfigured()) {
     return { ok: false, reason: "NOT_CONFIGURED" };
   }
 
   try {
-    const payload = cases.length === 0 ? null : cases;
+    const payload = normalized.length === 0 ? null : normalized;
     const res = await fetch(FIREBASE_CASES_ENDPOINT, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -1255,6 +1428,7 @@ async function syncVisitorCasesToCloud(cases) {
   }
 }
 
+/* 取得所有個案（原始四位 + 現場觀眾） */
 function getAllParticipants() {
   return [...BASE_PARTICIPANTS, ...VISITOR_PARTICIPANTS];
 }
@@ -1263,44 +1437,45 @@ function isVisitorCaseById(id) {
   return VISITOR_PARTICIPANTS.some(p => p.id === id);
 }
 
+/* 判斷目前裝置是否在 3 分鐘內建立該觀眾病例 */
 function canEditOrDeleteCase(caseItem) {
   if (!caseItem || !caseItem.ownerToken || !caseItem.createdAt) return false;
   if (caseItem.ownerToken !== CURRENT_DEVICE_TOKEN) return false;
-  const elapsed = Date.now() - Number(caseItem.createdAt);
-  return elapsed >= 0 && elapsed < EDIT_WINDOW_MS;
+  return (Date.now() - Number(caseItem.createdAt)) < EDIT_WINDOW_MS;
 }
 
 function getRemainingEditSeconds(caseItem) {
   if (!canEditOrDeleteCase(caseItem)) return 0;
-  const remainingMs = EDIT_WINDOW_MS - (Date.now() - Number(caseItem.createdAt));
-  return Math.max(0, Math.ceil(remainingMs / 1000));
+  const remainMs = EDIT_WINDOW_MS - (Date.now() - Number(caseItem.createdAt));
+  return Math.max(0, Math.ceil(remainMs / 1000));
 }
 
-function formatSecondsMMSS(sec) {
-  const m = String(Math.floor(sec / 60)).padStart(2, '0');
-  const s = String(sec % 60).padStart(2, '0');
-  return `${m}:${s}`;
+function formatSecondsMMSS(totalSeconds) {
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
+/* 更新觀眾病例數量與下一個編號預覽 */
 function updateCaseCountersUI() {
-  const visitorTotalEl = document.getElementById('visitor-total-label');
-  const nextIdEl = document.getElementById('next-case-preview');
-  const visitorCountStr = String(VISITOR_PARTICIPANTS.length).padStart(2, '0');
+  const countLabel = document.getElementById('visitor-total-label');
+  const nextPreview = document.getElementById('next-case-preview');
 
-  if (visitorTotalEl) {
-    visitorTotalEl.innerText = `VISITOR CASES: ${visitorCountStr}`;
+  if (countLabel) {
+    const countStr = String(VISITOR_PARTICIPANTS.length).padStart(2, '0');
+    countLabel.innerText = `VISITOR CASES: ${countStr}`;
   }
 
-  if (nextIdEl) {
+  if (nextPreview) {
     if (editingCaseId) {
-      nextIdEl.innerText = `EDITING: CASE #${editingCaseId}`;
+      nextPreview.innerText = `EDITING ID: CASE #${editingCaseId}`;
     } else {
       const maxNum = VISITOR_PARTICIPANTS.reduce((max, item) => {
         const n = parseInt(item.id, 10);
         return !isNaN(n) && n > max ? n : max;
       }, BASE_PARTICIPANTS.length);
-      const nextIdStr = String(maxNum + 1).padStart(2, '0');
-      nextIdEl.innerText = `NEXT ID: CASE #${nextIdStr}`;
+      const nextNum = String(maxNum + 1).padStart(2, '0');
+      nextPreview.innerText = `NEXT ID: CASE #${nextNum}`;
     }
   }
 }
@@ -1499,116 +1674,59 @@ function buildCaseCardHTML(p, isVisitor = false) {
   const deviceImgSrc = formatImageSrc(p.deviceImageUrl || p.imageUrl);
   const editable = isVisitor && canEditOrDeleteCase(p);
 
+  const deviceImgHTML = (!isVisitor && deviceImgSrc)
+    ? `<img src="${deviceImgSrc}" alt="Proxy Device" onerror="this.style.display='none'" class="w-full h-full object-cover opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10">`
+    : '';
+
+  const mediaHTML = imgSrc
+    ? `<img src="${imgSrc}" alt="${p.name}" onerror="this.style.display='none'" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 absolute inset-0 z-0">${deviceImgHTML}`
+    : `<div class="flex flex-col items-center space-y-2 text-gray-700">
+        <svg class="w-10 h-10 sm:w-12 sm:h-12 stroke-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        <span class="text-[10px] font-mono text-gray-600">NO SCAN DATA</span>
+      </div>`;
+
+  const ownerControlsHTML = editable
+    ? `<div class="grid grid-cols-2 gap-1.5 w-full" onclick="event.stopPropagation()">
+        <button type="button" onclick="startEditVisitorCase('${p.id}')" class="w-full py-1 sm:py-1.5 rounded bg-white/95 text-black font-mono text-[10px] sm:text-xs font-bold hover:bg-gray-200 transition-colors shadow text-center cursor-pointer">✎ 修改</button>
+        <button type="button" onclick="deleteVisitorCase('${p.id}')" class="w-full py-1 sm:py-1.5 rounded bg-red-950/90 text-red-400 border border-red-700/70 font-mono text-[10px] sm:text-xs font-bold hover:bg-red-800 hover:text-white transition-colors shadow text-center cursor-pointer">✕ 刪除</button>
+      </div>`
+    : '';
+
   return `
     <div
       onclick="showDetail('${p.id}')"
       class="glass-card rounded-xl overflow-hidden cursor-pointer flex flex-col justify-between relative group"
     >
-
       <div class="aspect-[3/4] w-full bg-gray-950 relative overflow-hidden flex items-center justify-center">
-
         <div class="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 pointer-events-none z-30">
           <span class="text-[10px] sm:text-xs font-mono text-white tracking-wider font-bold bg-black/70 backdrop-blur-md px-2 sm:px-2.5 py-0.5 sm:py-1 rounded shadow-lg inline-block transition-all duration-300 group-hover:bg-transparent group-hover:backdrop-blur-none group-hover:shadow-none mobile-auto-bg-fade">
             CASE #${p.id}
           </span>
         </div>
 
-        ${
-          imgSrc
-            ? `
-              <img
-                src="${imgSrc}"
-                alt="${p.name}"
-                onerror="this.style.display='none'"
-                class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 absolute inset-0 z-0"
-              >
-
-              ${
-                !isVisitor && deviceImgSrc
-                  ? `
-                    <img
-                      src="${deviceImgSrc}"
-                      alt="Proxy Device"
-                      onerror="this.style.display='none'"
-                      class="w-full h-full object-cover opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10"
-                    >
-                  `
-                  : ''
-              }
-            `
-            : `
-              <div class="flex flex-col items-center space-y-2 text-gray-700">
-
-                <svg
-                  class="w-10 h-10 sm:w-12 sm:h-12 stroke-gray-700"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-
-                <span class="text-[10px] font-mono text-gray-600">
-                  NO SCAN DATA
-                </span>
-
-              </div>
-            `
-        }
+        ${mediaHTML}
 
         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none z-20"></div>
 
         <div class="absolute ${editable ? 'bottom-[74px] sm:bottom-[82px]' : 'bottom-12 sm:bottom-14'} left-3 right-3 sm:left-4 sm:right-4 space-y-0.5 pointer-events-none z-30 transition-all duration-300">
-
           <h3 class="text-sm sm:text-lg font-bold text-white tracking-wide truncate">
             ${p.name}
           </h3>
-
           <p class="text-[10px] sm:text-xs text-gray-300 font-mono truncate">
             ${p.role}
           </p>
-
         </div>
 
         <div class="absolute bottom-2.5 left-2.5 right-2.5 sm:bottom-3 sm:left-3 sm:right-3 z-30 flex flex-col gap-1.5">
-
-          ${
-            editable
-              ? `
-                <div class="grid grid-cols-2 gap-1.5 w-full" onclick="event.stopPropagation()">
-                  <button
-                    type="button"
-                    onclick="startEditVisitorCase('${p.id}')"
-                    class="w-full py-1 sm:py-1.5 rounded bg-white/95 text-black font-mono text-[10px] sm:text-xs font-bold hover:bg-gray-200 transition-colors shadow text-center"
-                  >
-                    ✎ 修改
-                  </button>
-                  <button
-                    type="button"
-                    onclick="deleteVisitorCase('${p.id}')"
-                    class="w-full py-1 sm:py-1.5 rounded bg-red-950/90 text-red-400 border border-red-700/70 font-mono text-[10px] sm:text-xs font-bold hover:bg-red-800 hover:text-white transition-colors shadow text-center"
-                  >
-                    ✕ 刪除
-                  </button>
-                </div>
-              `
-              : ''
-          }
-
-          <button class="btn-neon w-full py-1.5 sm:py-2 text-[10px] sm:text-xs rounded shadow-lg flex items-center justify-center space-x-1">
+          ${ownerControlsHTML}
+          <button class="btn-neon w-full py-1.5 sm:py-2 text-[10px] sm:text-xs rounded shadow-lg flex items-center justify-center space-x-1 cursor-pointer">
             <span>檢視個案診斷</span>
             <span>→</span>
           </button>
-
         </div>
-
       </div>
-
     </div>
   `;
 }
@@ -1649,29 +1767,8 @@ function renderPortalCards(force = false) {
   updateCaseCountersUI();
 }
 
-/* 人像去背 + 一般黑白灰階 + 適度曝光微調 */
-let selfieSegmenterInstance = null;
-
-function getSelfieSegmenter() {
-  if (selfieSegmenterInstance) return selfieSegmenterInstance;
-  if (typeof SelfieSegmentation === "undefined") return null;
-
-  try {
-    const segmenter = new SelfieSegmentation({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
-    });
-    segmenter.setOptions({
-      modelSelection: 1,
-      selfieMode: false
-    });
-    selfieSegmenterInstance = segmenter;
-    return segmenter;
-  } catch (e) {
-    return null;
-  }
-}
-
-function applyClinicalMonochromeTone(ctx, width, height, alphaMaskData = null) {
+/* 觀眾影像處理：黑白灰階 + 曝光微調 + 可切換隱私模糊保護 */
+function applyOriginalVisitorMonochromeTone(ctx, width, height) {
   const imgData = ctx.getImageData(0, 0, width, height);
   const data = imgData.data;
 
@@ -1679,15 +1776,6 @@ function applyClinicalMonochromeTone(ctx, width, height, alphaMaskData = null) {
   const contrastFactor = 1.08;
 
   for (let i = 0; i < data.length; i += 4) {
-    const fgAlpha = alphaMaskData ? alphaMaskData[i + 3] / 255 : 1;
-
-    if (fgAlpha < 0.08) {
-      data[i] = 8;
-      data[i + 1] = 9;
-      data[i + 2] = 10;
-      continue;
-    }
-
     const r = data[i];
     const g = data[i + 1];
     const b = data[i + 2];
@@ -1697,10 +1785,7 @@ function applyClinicalMonochromeTone(ctx, width, height, alphaMaskData = null) {
     lum = (lum - 0.5) * contrastFactor + 0.5;
     lum = Math.max(0, Math.min(1, lum));
 
-    const edgeBlend = Math.min(1, Math.max(0, (fgAlpha - 0.08) / 0.55));
-    const finalLum = lum * edgeBlend + (8 / 255) * (1 - edgeBlend);
-
-    const val = Math.round(finalLum * 255);
+    const val = Math.round(lum * 255);
     data[i] = val;
     data[i + 1] = val;
     data[i + 2] = val;
@@ -1709,79 +1794,12 @@ function applyClinicalMonochromeTone(ctx, width, height, alphaMaskData = null) {
   ctx.putImageData(imgData, 0, 0);
 }
 
-function fallbackBackgroundCutout(img, width, height) {
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(img, 0, 0, width, height);
-
-  const imgData = ctx.getImageData(0, 0, width, height);
-  const data = imgData.data;
-
-  const maskCanvas = document.createElement('canvas');
-  maskCanvas.width = width;
-  maskCanvas.height = height;
-  const maskCtx = maskCanvas.getContext('2d');
-  const maskImgData = maskCtx.createImageData(width, height);
-  const mData = maskImgData.data;
-
-  const corners = [
-    0,
-    (width - 1) * 4,
-    (Math.floor(height * 0.15) * width) * 4,
-    (Math.floor(height * 0.15) * width + width - 1) * 4
-  ];
-
-  let bgR = 0, bgG = 0, bgB = 0;
-  corners.forEach(idx => {
-    bgR += data[idx];
-    bgG += data[idx + 1];
-    bgB += data[idx + 2];
-  });
-  bgR /= corners.length;
-  bgG /= corners.length;
-  bgB /= corners.length;
-
-  const cx = width * 0.5;
-  const cy = height * 0.48;
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const idx = (y * width + x) * 4;
-      const dr = data[idx] - bgR;
-      const dg = data[idx + 1] - bgG;
-      const db = data[idx + 2] - bgB;
-      const colorDist = Math.sqrt(dr * dr + dg * dg + db * db);
-
-      const nx = (x - cx) / (width * 0.42);
-      const ny = (y - cy) / (height * 0.50);
-      const radialDist = Math.sqrt(nx * nx + ny * ny);
-
-      let alpha = 255;
-      if (colorDist < 42 && radialDist > 0.60) {
-        alpha = 0;
-      } else if (radialDist > 0.94) {
-        alpha = Math.max(0, Math.round(255 * (1 - (radialDist - 0.94) * 4)));
-      }
-
-      mData[idx] = 255;
-      mData[idx + 1] = 255;
-      mData[idx + 2] = 255;
-      mData[idx + 3] = alpha;
-    }
-  }
-
-  applyClinicalMonochromeTone(ctx, width, height, mData);
-  return canvas.toDataURL('image/jpeg', 0.78);
-}
-
-function processPortraitCutoutAndTone(file) {
+function processVisitorPhotoTone(file) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = function(event) {
       const img = new Image();
-      img.onload = async function() {
+      img.onload = function() {
         const maxDim = 720;
         let width = img.width;
         let height = img.height;
@@ -1796,56 +1814,14 @@ function processPortraitCutoutAndTone(file) {
           }
         }
 
-        const segmenter = getSelfieSegmenter();
-        if (!segmenter) {
-          resolve(fallbackBackgroundCutout(img, width, height));
-          return;
-        }
+        const outCanvas = document.createElement('canvas');
+        outCanvas.width = width;
+        outCanvas.height = height;
+        const outCtx = outCanvas.getContext('2d');
+        outCtx.drawImage(img, 0, 0, width, height);
+        applyOriginalVisitorMonochromeTone(outCtx, width, height);
 
-        let resolved = false;
-        const timeoutId = setTimeout(() => {
-          if (!resolved) {
-            resolved = true;
-            resolve(fallbackBackgroundCutout(img, width, height));
-          }
-        }, 4500);
-
-        try {
-          segmenter.onResults((results) => {
-            if (resolved) return;
-            resolved = true;
-            clearTimeout(timeoutId);
-
-            const maskCanvas = document.createElement('canvas');
-            maskCanvas.width = width;
-            maskCanvas.height = height;
-            const maskCtx = maskCanvas.getContext('2d');
-            maskCtx.drawImage(results.segmentationMask, 0, 0, width, height);
-            const alphaMaskData = maskCtx.getImageData(0, 0, width, height).data;
-
-            const outCanvas = document.createElement('canvas');
-            outCanvas.width = width;
-            outCanvas.height = height;
-            const outCtx = outCanvas.getContext('2d');
-            outCtx.drawImage(results.image, 0, 0, width, height);
-
-            applyClinicalMonochromeTone(outCtx, width, height, alphaMaskData);
-
-            resolve(outCanvas.toDataURL('image/jpeg', 0.78));
-          });
-
-          const inputCanvas = document.createElement('canvas');
-          inputCanvas.width = width;
-          inputCanvas.height = height;
-          inputCanvas.getContext('2d').drawImage(img, 0, 0, width, height);
-          await segmenter.send({ image: inputCanvas });
-        } catch (err) {
-          if (!resolved) {
-            resolved = true;
-            clearTimeout(timeoutId);
-            resolve(fallbackBackgroundCutout(img, width, height));
-          }
-        }
+        resolve(outCanvas.toDataURL('image/jpeg', 0.82));
       };
       img.src = event.target.result;
     };
@@ -1853,18 +1829,10 @@ function processPortraitCutoutAndTone(file) {
   });
 }
 
-function rebuildOutputPhotoWithPrivacyOption() {
+function applyPrivacyBlurToDataUrl(sourceDataUrl) {
   return new Promise((resolve) => {
-    if (!rawCutoutBaseDataUrl) {
-      capturedPhotoDataUrl = "";
+    if (!sourceDataUrl) {
       resolve("");
-      return;
-    }
-
-    if (!isPrivacyBlurEnabled) {
-      capturedPhotoDataUrl = rawCutoutBaseDataUrl;
-      updatePhotoPreviewUI();
-      resolve(capturedPhotoDataUrl);
       return;
     }
 
@@ -1879,15 +1847,15 @@ function rebuildOutputPhotoWithPrivacyOption() {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       if (typeof ctx.filter !== 'undefined') {
-        ctx.filter = 'blur(7px)';
+        ctx.filter = 'blur(8px)';
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         ctx.globalAlpha = 0.45;
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         ctx.globalAlpha = 1;
         ctx.filter = 'none';
       } else {
-        const smallW = Math.max(64, Math.round(canvas.width * 0.28));
-        const smallH = Math.max(80, Math.round(canvas.height * 0.28));
+        const smallW = Math.max(64, Math.round(canvas.width * 0.25));
+        const smallH = Math.max(80, Math.round(canvas.height * 0.25));
         const tmpCanvas = document.createElement('canvas');
         tmpCanvas.width = smallW;
         tmpCanvas.height = smallH;
@@ -1901,12 +1869,31 @@ function rebuildOutputPhotoWithPrivacyOption() {
         ctx.drawImage(tmpCanvas, 0, 0, smallW, smallH, 0, 0, canvas.width, canvas.height);
       }
 
-      capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.78);
-      updatePhotoPreviewUI();
-      resolve(capturedPhotoDataUrl);
+      resolve(canvas.toDataURL('image/jpeg', 0.82));
     };
-    img.src = rawCutoutBaseDataUrl;
+    img.onerror = function() {
+      resolve(sourceDataUrl);
+    };
+    img.src = sourceDataUrl;
   });
+}
+
+async function rebuildOutputPhotoWithPrivacyOption() {
+  if (!rawMonochromeBaseDataUrl) {
+    capturedPhotoDataUrl = "";
+    updatePhotoPreviewUI();
+    return "";
+  }
+
+  if (!isPrivacyBlurEnabled) {
+    capturedPhotoDataUrl = rawMonochromeBaseDataUrl;
+    updatePhotoPreviewUI();
+    return capturedPhotoDataUrl;
+  }
+
+  capturedPhotoDataUrl = await applyPrivacyBlurToDataUrl(rawMonochromeBaseDataUrl);
+  updatePhotoPreviewUI();
+  return capturedPhotoDataUrl;
 }
 
 function updatePhotoPreviewUI() {
@@ -1927,17 +1914,16 @@ function updatePhotoPreviewUI() {
 
   if (previewBadge) {
     previewBadge.innerText = isPrivacyBlurEnabled
-      ? "✓ 影像已完成去背＋黑白曝光＋高解析柔焦模糊"
-      : "✓ 影像已完成去背與黑白曝光調整";
+      ? "✓ 影像已完成黑白曝光＋高解析柔焦模糊"
+      : "✓ 影像已完成黑白曝光調整";
   }
 }
 
-async function togglePrivacyBlur() {
-  isPrivacyBlurEnabled = !isPrivacyBlurEnabled;
-
+function syncPrivacyBlurButtonUI() {
   const btn = document.getElementById('privacy-blur-toggle');
   const indicator = document.getElementById('privacy-blur-indicator');
   const label = document.getElementById('privacy-blur-label');
+  if (!btn || !indicator || !label) return;
 
   if (isPrivacyBlurEnabled) {
     btn.className = "w-full sm:w-auto px-3.5 py-2 rounded text-xs font-mono inline-flex items-center justify-center gap-2 border transition-all cursor-pointer bg-emerald-950/50 text-emerald-400 border-emerald-500/60";
@@ -1948,14 +1934,19 @@ async function togglePrivacyBlur() {
     indicator.className = "w-2 h-2 rounded-full bg-gray-500";
     label.innerText = "隱私模糊保護：關閉 (點擊模糊化臉部)";
   }
+}
 
-  if (rawCutoutBaseDataUrl) {
+async function togglePrivacyBlur() {
+  isPrivacyBlurEnabled = !isPrivacyBlurEnabled;
+  syncPrivacyBlurButtonUI();
+
+  if (rawMonochromeBaseDataUrl) {
     await rebuildOutputPhotoWithPrivacyOption();
   }
 }
 
 function clearCapturedPhoto() {
-  rawCutoutBaseDataUrl = "";
+  rawMonochromeBaseDataUrl = "";
   capturedPhotoDataUrl = "";
   const photoInput = document.getElementById('visitor-photo-input');
   const previewBox = document.getElementById('photo-preview-box');
@@ -1973,7 +1964,7 @@ async function handleSelectedImageFile(file) {
   const statusEl = document.getElementById('photo-processing-status');
   if (statusEl) statusEl.classList.remove('hidden');
 
-  rawCutoutBaseDataUrl = await processPortraitCutoutAndTone(file);
+  rawMonochromeBaseDataUrl = await processVisitorPhotoTone(file);
   await rebuildOutputPhotoWithPrivacyOption();
 
   if (statusEl) statusEl.classList.add('hidden');
@@ -1982,7 +1973,7 @@ async function handleSelectedImageFile(file) {
 function startEditVisitorCase(id) {
   const target = VISITOR_PARTICIPANTS.find(p => p.id === id);
   if (!target || !canEditOrDeleteCase(target)) {
-    alert("此病例已超過 3 分鐘修改時限，或非原上傳裝置建立之檔案。");
+    showToast("此病例已超過 3 分鐘修改時限，或非原上傳裝置建立之檔案。");
     renderPortalCards(true);
     return;
   }
@@ -1995,9 +1986,13 @@ function startEditVisitorCase(id) {
   document.getElementById('visitor-birth').value = target.birthDate || "";
   document.getElementById('visitor-anxiety').value = target.anxiety || "";
 
-  if (target.rawImageUrl || target.imageUrl) {
-    rawCutoutBaseDataUrl = target.rawImageUrl || target.imageUrl;
-    capturedPhotoDataUrl = target.imageUrl || target.rawImageUrl;
+  isPrivacyBlurEnabled = Boolean(target.privacyBlurEnabled);
+  syncPrivacyBlurButtonUI();
+
+  const existingPhoto = resolveVisitorPhotoSrc(target);
+  if (target.rawImageUrl || existingPhoto) {
+    rawMonochromeBaseDataUrl = target.rawImageUrl || existingPhoto;
+    capturedPhotoDataUrl = existingPhoto || target.rawImageUrl;
     updatePhotoPreviewUI();
   } else {
     clearCapturedPhoto();
@@ -2018,6 +2013,8 @@ function startEditVisitorCase(id) {
 
 function cancelEditMode() {
   editingCaseId = null;
+  isPrivacyBlurEnabled = false;
+  syncPrivacyBlurButtonUI();
   const form = document.getElementById('visitor-case-form');
   if (form) form.reset();
   clearCapturedPhoto();
@@ -2032,12 +2029,8 @@ function cancelEditMode() {
 async function deleteVisitorCase(id) {
   const target = VISITOR_PARTICIPANTS.find(p => p.id === id);
   if (!target || !canEditOrDeleteCase(target)) {
-    alert("此病例已超過 3 分鐘刪除時限，或非原上傳裝置建立之檔案。");
+    showToast("此病例已超過 3 分鐘刪除時限，或非原上傳裝置建立之檔案。");
     renderPortalCards(true);
-    return;
-  }
-
-  if (!confirm(`確定要刪除病例 CASE #${id}（${target.name}）嗎？`)) {
     return;
   }
 
@@ -2054,11 +2047,14 @@ async function deleteVisitorCase(id) {
     showPortal();
   }
 
+  const msg = syncResult.ok
+    ? `已從雲端刪除病例 CASE #${id}（全裝置已同步）。`
+    : `已刪除病例 CASE #${id}（雲端連線異常，已於本機更新）。`;
+
+  showToast(msg);
   const feedback = document.getElementById('visitor-form-feedback');
   if (feedback) {
-    feedback.innerText = syncResult.ok
-      ? `已從雲端刪除病例 CASE #${id}（全裝置已同步）。`
-      : `已刪除病例 CASE #${id}（雲端連線異常，已於本機更新）。`;
+    feedback.innerText = msg;
   }
 }
 
@@ -2092,6 +2088,11 @@ function initVisitorForm() {
 
     feedback.textContent = "正在同步至雲端資料庫...";
 
+    let finalPhotoDataUrl = capturedPhotoDataUrl;
+    if (rawMonochromeBaseDataUrl) {
+      finalPhotoDataUrl = await rebuildOutputPhotoWithPrivacyOption();
+    }
+
     if (editingCaseId) {
       const idx = VISITOR_PARTICIPANTS.findIndex(p => p.id === editingCaseId);
       if (idx === -1 || !canEditOrDeleteCase(VISITOR_PARTICIPANTS[idx])) {
@@ -2111,9 +2112,10 @@ function initVisitorForm() {
         target: `${resolvedName} (本體)`,
         anxiety: anxietyInput || existing.anxiety,
         birthDate: resolvedBirth,
-        rawImageUrl: rawCutoutBaseDataUrl,
-        imageUrl: capturedPhotoDataUrl,
-        deviceImageUrl: capturedPhotoDataUrl,
+        rawImageUrl: rawMonochromeBaseDataUrl,
+        imageUrl: finalPhotoDataUrl,
+        deviceImageUrl: finalPhotoDataUrl,
+        privacyBlurEnabled: isPrivacyBlurEnabled,
         statement: statementInput
       };
 
@@ -2149,9 +2151,10 @@ function initVisitorForm() {
       target: `${resolvedName} (本體)`,
       anxiety: anxietyInput || "85.0% (現場登錄)",
       birthDate: resolvedBirth,
-      rawImageUrl: rawCutoutBaseDataUrl,
-      imageUrl: capturedPhotoDataUrl,
-      deviceImageUrl: capturedPhotoDataUrl,
+      rawImageUrl: rawMonochromeBaseDataUrl,
+      imageUrl: finalPhotoDataUrl,
+      deviceImageUrl: finalPhotoDataUrl,
+      privacyBlurEnabled: isPrivacyBlurEnabled,
       signatureUrl: "",
       statement: statementInput,
       ownerToken: CURRENT_DEVICE_TOKEN,
@@ -2161,6 +2164,8 @@ function initVisitorForm() {
     VISITOR_PARTICIPANTS = [...VISITOR_PARTICIPANTS, newCase];
     const syncResult = await syncVisitorCasesToCloud(VISITOR_PARTICIPANTS);
 
+    isPrivacyBlurEnabled = false;
+    syncPrivacyBlurButtonUI();
     renderPortalCards(true);
     form.reset();
     clearCapturedPhoto();
@@ -2336,6 +2341,7 @@ function showDetail(id) {
 
 /* 初始化 */
 window.addEventListener('DOMContentLoaded', async () => {
+  syncPrivacyBlurButtonUI();
   renderPortalCards(true);
   initComparisonSlider();
   startOutputFluctuationWithPause();
@@ -2344,8 +2350,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   if (hasFirebaseConfigured()) {
     const cloudCases = await fetchCloudVisitorCases();
-    VISITOR_PARTICIPANTS = cloudCases;
-    saveLocalVisitorCases(cloudCases);
+    const hadMissingCloudPhoto = cloudCases.some(c => !resolveVisitorPhotoSrc(c)) &&
+      VISITOR_PARTICIPANTS.some(c => Boolean(resolveVisitorPhotoSrc(c)));
+    VISITOR_PARTICIPANTS = cloudCases.length > 0 ? cloudCases : VISITOR_PARTICIPANTS;
+    saveLocalVisitorCases(VISITOR_PARTICIPANTS);
+    if (hadMissingCloudPhoto) {
+      await syncVisitorCasesToCloud(VISITOR_PARTICIPANTS);
+    }
     renderPortalCards(true);
     startCloudSyncPolling();
   }
