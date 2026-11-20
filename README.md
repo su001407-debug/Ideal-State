@@ -506,7 +506,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
           </h2>
 
           <p class="text-xs text-gray-500">
-            跨裝置同步收錄觀眾提交之個人焦慮病例（上傳後 3 分鐘內可於原裝置修改或刪除）
+            收錄觀眾提交之個人焦慮病例（上傳後 3 分鐘內可於原裝置修改或刪除）
           </p>
         </div>
 
@@ -536,7 +536,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
             </h3>
 
             <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-              只需填寫焦慮自白即可建立病例（其餘皆可選填）；上傳後 3 分鐘內僅限原上傳裝置可編輯或刪除
+              請填寫焦慮自白與出生日期即可建立病例（姓名、焦慮指數與照片皆可選填）；上傳後 3 分鐘內僅限原上傳裝置可編輯或刪除
             </p>
           </div>
 
@@ -564,13 +564,13 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
 
             <div class="w-full min-w-0">
-              <label for="visitor-name" class="block text-[10px] text-gray-400 mb-1.5">
-                委託人姓名 / 代號 (選填)
+              <label for="visitor-birth" class="block text-[10px] text-emerald-400 font-bold mb-1.5">
+                出生日期 (必填，計算呼吸數) *
               </label>
               <input
-                type="text"
-                id="visitor-name"
-                placeholder="例如：王Ｏ明（留空自動編號）"
+                type="date"
+                id="visitor-birth"
+                required
                 class="clinical-input"
               >
             </div>
@@ -1135,7 +1135,7 @@ const BASE_PARTICIPANTS = [
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-b70cd799-0bbf-4737-a890-d4c0962fe741.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-10-27-4e230bf1-0d8a-429f-b28d-9e4734ace26d.jpg",
     signatureUrl: "",
-    statement: "休假對我來說不是放鬆，而是一場審判。躺在床上滑手機的每一分鐘，都在盤算著自己少做了多少事。如果一定要有人在那裡放空，那就讓這顆塑膠薄膜包覆的人頭替我坐牢吧。"
+    statement: "壓力來時，既要照常過日子，又要安撫腦中的聲音，悶得說不出口，像梅雨天關著窗的房間，連呼吸都潮濕沉重。"
   },
   {
     id: "04",
@@ -2100,6 +2100,11 @@ function initVisitorForm() {
       return;
     }
 
+    if (!birthInput) {
+      feedback.textContent = "請填寫出生日期。";
+      return;
+    }
+
     feedback.textContent = "正在同步至雲端資料庫...";
 
     let finalPhotoDataUrl = capturedPhotoDataUrl;
@@ -2118,7 +2123,7 @@ function initVisitorForm() {
 
       const existing = VISITOR_PARTICIPANTS[idx];
       const resolvedName = nameInput || existing.name;
-      const resolvedBirth = birthInput || existing.birthDate || "2005-01-01";
+      const resolvedBirth = birthInput;
 
       VISITOR_PARTICIPANTS[idx] = {
         ...existing,
@@ -2156,7 +2161,7 @@ function initVisitorForm() {
     const nextNum = maxNum + 1;
     const nextId = String(nextNum).padStart(2, '0');
     const resolvedName = nameInput || `現場委託人 #${nextId}`;
-    const resolvedBirth = birthInput || "2005-01-01";
+    const resolvedBirth = birthInput;
 
     const newCase = {
       id: nextId,
