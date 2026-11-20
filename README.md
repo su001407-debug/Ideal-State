@@ -1773,7 +1773,7 @@ function fallbackBackgroundCutout(img, width, height) {
   }
 
   applyClinicalMonochromeTone(ctx, width, height, mData);
-  return canvas.toDataURL('image/jpeg', 0.62);
+  return canvas.toDataURL('image/jpeg', 0.78);
 }
 
 function processPortraitCutoutAndTone(file) {
@@ -1782,7 +1782,7 @@ function processPortraitCutoutAndTone(file) {
     reader.onload = function(event) {
       const img = new Image();
       img.onload = async function() {
-        const maxDim = 420;
+        const maxDim = 720;
         let width = img.width;
         let height = img.height;
 
@@ -1831,7 +1831,7 @@ function processPortraitCutoutAndTone(file) {
 
             applyClinicalMonochromeTone(outCtx, width, height, alphaMaskData);
 
-            resolve(outCanvas.toDataURL('image/jpeg', 0.62));
+            resolve(outCanvas.toDataURL('image/jpeg', 0.78));
           });
 
           const inputCanvas = document.createElement('canvas');
@@ -1879,23 +1879,29 @@ function rebuildOutputPhotoWithPrivacyOption() {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       if (typeof ctx.filter !== 'undefined') {
-        ctx.filter = 'blur(12px)';
+        ctx.filter = 'blur(7px)';
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 0.45;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 1;
         ctx.filter = 'none';
       } else {
-        const smallW = Math.max(16, Math.round(canvas.width * 0.06));
-        const smallH = Math.max(20, Math.round(canvas.height * 0.06));
+        const smallW = Math.max(64, Math.round(canvas.width * 0.28));
+        const smallH = Math.max(80, Math.round(canvas.height * 0.28));
         const tmpCanvas = document.createElement('canvas');
         tmpCanvas.width = smallW;
         tmpCanvas.height = smallH;
         const tmpCtx = tmpCanvas.getContext('2d');
+        tmpCtx.imageSmoothingEnabled = true;
+        tmpCtx.imageSmoothingQuality = 'high';
         tmpCtx.drawImage(img, 0, 0, smallW, smallH);
 
         ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(tmpCanvas, 0, 0, smallW, smallH, 0, 0, canvas.width, canvas.height);
       }
 
-      capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.60);
+      capturedPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.78);
       updatePhotoPreviewUI();
       resolve(capturedPhotoDataUrl);
     };
@@ -1921,7 +1927,7 @@ function updatePhotoPreviewUI() {
 
   if (previewBadge) {
     previewBadge.innerText = isPrivacyBlurEnabled
-      ? "✓ 影像已完成去背＋黑白曝光＋隱私模糊加密"
+      ? "✓ 影像已完成去背＋黑白曝光＋高解析柔焦模糊"
       : "✓ 影像已完成去背與黑白曝光調整";
   }
 }
