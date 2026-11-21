@@ -803,7 +803,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
         </div>
 
         <p id="detail-hair-removal-note" class="text-[10px] font-mono text-gray-400 tracking-wide pb-1">
-          Hair removed during proxy process
+          ※ 註：毛髮已在代理過程中去除（Hair removed during proxy process）
         </p>
 
       </div>
@@ -906,7 +906,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
         </div>
 
-        <div class="md:col-span-2 bg-gray-950/80 rounded-lg p-5 border border-gray-800/80 flex flex-col justify-between space-y-4 font-mono text-xs overflow-hidden">
+        <div class="md:col-span-2 bg-gray-950/80 rounded-lg p-5 sm:p-6 border border-gray-800/80 flex flex-col justify-between space-y-4 font-mono text-xs overflow-hidden">
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-b border-gray-800/80 pb-4">
 
@@ -989,26 +989,26 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
       </div>
 
-      <div class="bg-gray-950/90 rounded-lg p-6 border border-gray-800/80 relative">
+      <div class="bg-gray-950/90 rounded-lg p-5 sm:p-6 border border-gray-800/80 relative">
 
-        <span class="text-[10px] font-mono text-gray-500 tracking-widest absolute top-3 right-4">
+        <span class="text-[10px] font-mono text-gray-500 tracking-widest block sm:absolute sm:top-4 sm:right-6 mb-1.5 sm:mb-0">
           STATEMENT ARCHIVE
         </span>
 
-        <h3 class="text-xs font-mono text-gray-400 tracking-wider mb-3">
+        <h3 class="text-xs font-mono text-gray-400 tracking-wider mb-3 -ml-[0.5em]">
           【本體焦慮自白紀錄】
         </h3>
 
         <blockquote
           id="detail-statement"
-          class="text-sm md:text-base text-gray-200 leading-relaxed font-sans italic border-l-2 border-emerald-500/60 pl-4 py-1"
+          class="text-sm md:text-base text-gray-200 leading-relaxed font-sans italic border-l-2 border-emerald-500/60 pl-3.5 sm:pl-4 py-1"
         >
           "---"
         </blockquote>
 
       </div>
 
-      <div class="bg-gray-950/90 rounded-lg p-6 border border-gray-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono">
+      <div class="bg-gray-950/90 rounded-lg p-5 sm:p-6 border border-gray-800/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 font-mono">
         <div>
           <span class="text-[10px] text-emerald-400 tracking-widest block mb-1">
             OFFICIAL SIGNATURE / 官方授權簽署紀錄
@@ -1018,7 +1018,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
           </p>
         </div>
 
-        <div class="flex items-center justify-center min-w-[160px] h-[120px] relative overflow-hidden shrink-0">
+        <div class="flex items-center justify-center w-full sm:w-auto min-w-[160px] h-[120px] relative overflow-hidden shrink-0">
           <img id="detail-signature-img" src="" alt="Principal Signature" referrerpolicy="no-referrer" decoding="async" class="max-h-28 max-w-[180px] object-contain opacity-95 mix-blend-screen hidden">
           <span id="detail-signature-placeholder" class="text-[10px] text-gray-600 tracking-widest">
             PENDING SEAL
@@ -1091,7 +1091,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
         <section class="space-y-1.5">
 
           <h3 class="text-emerald-500 font-mono font-bold text-xs">
-            04. 現場參與
+            04. 現場觀眾的參與與延伸檔案
           </h3>
 
           <p class="text-gray-400">
