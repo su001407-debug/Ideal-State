@@ -1175,7 +1175,7 @@ const BASE_PARTICIPANTS = [
     birthDate: "2005-06-09",
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-b70cd799-0bbf-4737-a890-d4c0962fe741.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-10-27-4e230bf1-0d8a-429f-b28d-9e4734ace26d.jpg",
-    signatureUrl: "",
+    signatureUrl: "https://cdn.phototourl.com/member/2026-11-21-b43405a6-4bdc-4097-af21-e71561c00a32.png",
     statement: "壓力來時，既要照常過日子，又要安撫腦中的聲音，悶得說不出口，像梅雨天關著窗的房間，連呼吸都潮濕沉重。"
   },
   {
