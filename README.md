@@ -528,7 +528,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
           </h2>
 
           <p class="text-xs text-gray-500">
-            跨裝置同步收錄觀眾提交之個人焦慮病例（上傳後 3 分鐘內可於原裝置修改或刪除）
+            同步收錄觀眾提交之個人焦慮病例（上傳後 3 分鐘內可於原裝置修改或刪除）
           </p>
         </div>
 
@@ -1145,7 +1145,7 @@ const BASE_PARTICIPANTS = [
   {
     id: "01",
     name: "蘇Ｏ齊",
-    role: "代理呼吸員 01 號",
+    role: "受試者 01 號",
     target: "蘇Ｏ齊 (本體)",
     anxiety: "87.4% (極高)",
     birthDate: "2005-02-26",
@@ -1157,7 +1157,7 @@ const BASE_PARTICIPANTS = [
   {
     id: "02",
     name: "張Ｏ禎",
-    role: "代理呼吸員 02 號",
+    role: "受試者 02 號",
     target: "張Ｏ禎 (本體)",
     anxiety: "91.2% (極高)",
     birthDate: "2005-07-10",
@@ -1169,7 +1169,7 @@ const BASE_PARTICIPANTS = [
   {
     id: "03",
     name: "林Ｏ岑",
-    role: "代理呼吸員 03 號",
+    role: "受試者 03 號",
     target: "林Ｏ岑 (本體)",
     anxiety: "79.8% (高)",
     birthDate: "2005-06-09",
@@ -1181,7 +1181,7 @@ const BASE_PARTICIPANTS = [
   {
     id: "04",
     name: "陳Ｏ騏",
-    role: "代理呼吸員 04 號",
+    role: "受試者 04 號",
     target: "陳Ｏ騏 (本體)",
     anxiety: "20.0%~101.0% ",
     birthDate: "2005-01-13",
