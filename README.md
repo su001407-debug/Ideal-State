@@ -790,7 +790,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
         </div>
 
         <p class="text-[10px] font-mono text-gray-400 tracking-wide pb-1">
-          [SYSTEM NOTE] 個人特徵（髮型/皮肉）已於代理化過程中剝離。
+         
         </p>
 
       </div>
@@ -1076,7 +1076,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
           </h3>
 
           <p class="text-gray-400">
-            除了既有的四組委託人檔案之外，本檔案系統亦開放現場觀眾即時參與，讓觀者得以自行登錄並建立屬於自己的延伸病例檔案。觀眾可透過現場終端寫下面對空閒與無產出狀態時的「本體焦慮自白紀錄」、輸入出生日期以即時計算生命累積呼吸數，並可選擇拍攝或上傳影像（搭配隱私馬賽克保護功能）。這些由現場觀眾自主提交的病例，會即時同步匯入《理想狀態》的公共檔案目錄之中，使這份關於生產力焦慮與呼吸存在證明的臨床紀錄，隨著每一位觀者的加入而不斷擴張。
+            除了既有的四組委託人檔案之外，本檔案系統也向現場觀眾開放即時參與，讓觀者得以自行登錄並建立屬於自己的延伸病例檔案。觀眾可透過手中的裝置寫下面對空閒與無產出狀態時的「本體焦慮自白紀錄」。這些由現場觀眾自主提交的病例，會即時同步匯入《理想狀態》的公共檔案目錄之中，使這份關於生產力焦慮與呼吸存在證明的臨床紀錄，隨著每一位觀者的加入而不斷擴張。
           </p>
 
         </section>
@@ -1133,7 +1133,7 @@ const BASE_PARTICIPANTS = [
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-96d3b302-64c7-4d0a-92c3-dae869f734ea.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-10-27-116824ad-2295-48ab-bfc1-92ff1656d47d.jpg",
     signatureUrl: "https://cdn.phototourl.com/member/2026-11-12-7dcaeab3-e243-42a6-b786-45621df6d49b.png",
-    statement: "我發現自己根本無法忍受純粹的放空。只要一停下來，那種『時間正被浪費』的罪惡感就會把我吞噬。我做這個替身，不是為了讓自己舒服地去休息，而是因為我停不下來——我需要一個實體掛在那裡，替我承擔什麼都不做、只剩下呼吸的死寂。"
+    statement: "我發現自己根本無法忍受純粹的放空。只要一停下來，那種『時間正被浪費』的罪惡感就會把我吞噬。我停不下來——我需要讓腦袋不停的思考（詳情請至作品理念）。"
   },
   {
     id: "02",
@@ -1157,7 +1157,7 @@ const BASE_PARTICIPANTS = [
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-b70cd799-0bbf-4737-a890-d4c0962fe741.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-10-27-4e230bf1-0d8a-429f-b28d-9e4734ace26d.jpg",
     signatureUrl: "",
-    statement: "休假對我來說不是放鬆，而是一場審判。躺在床上滑手機的每一分鐘，都在盤算著自己少做了多少事。如果一定要有人在那裡放空，那就讓這顆塑膠薄膜包覆的人頭替我坐牢吧。"
+    statement: "壓力來時，既要照常過日子，又要安撫腦中的聲音，悶得說不出口，像梅雨天關著窗的房間，連呼吸都潮濕沉重。"
   },
   {
     id: "04",
