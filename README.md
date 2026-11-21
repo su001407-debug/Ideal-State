@@ -34,6 +34,14 @@ body {
   transition: all .35s cubic-bezier(.16,1,.3,1);
 }
 
+@media (max-width: 767px) {
+  .glass-card {
+    background: rgba(15,18,22,.96);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
 .glass-card:hover {
   border-color: rgba(16,185,129,.4);
   transform: translateY(-4px);
@@ -372,7 +380,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
 <body class="bg-grid-dark min-h-screen text-gray-300 relative selection:bg-emerald-500 selection:text-black">
 
-<div class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-80 bg-emerald-950/20 blur-[130px] pointer-events-none rounded-full"></div>
+<div class="hidden md:block fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-80 bg-emerald-950/20 blur-[130px] pointer-events-none rounded-full"></div>
 
 <!-- 系統訊息提示條 -->
 <div
@@ -1060,6 +1068,18 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
         </section>
 
+        <section class="space-y-1.5">
+
+          <h3 class="text-emerald-500 font-mono font-bold text-xs">
+            04. 現場觀眾的參與與延伸檔案
+          </h3>
+
+          <p class="text-gray-400">
+            除了既有的四組委託人檔案之外，本檔案系統亦開放現場觀眾即時參與，讓觀者得以自行登錄並建立屬於自己的延伸病例檔案。觀眾可透過現場終端寫下面對空閒與無產出狀態時的「本體焦慮自白紀錄」、輸入出生日期以即時計算生命累積呼吸數，並可選擇拍攝或上傳影像（搭配隱私馬賽克保護功能）。這些由現場觀眾自主提交的病例，會即時同步匯入《理想狀態》的公共檔案目錄之中，使這份關於生產力焦慮與呼吸存在證明的臨床紀錄，隨著每一位觀者的加入而不斷擴張。
+          </p>
+
+        </section>
+
       </div>
 
       <div
@@ -1221,9 +1241,20 @@ function formatImageSrc(url) {
     return trimmed;
   }
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    return `${trimmed}?v=${Date.now()}`;
+    return trimmed;
   }
   return "";
+}
+
+function handleCardImageError(imgEl, fallbackUrl) {
+  if (!imgEl) return;
+  if (!imgEl.dataset.retried && fallbackUrl) {
+    imgEl.dataset.retried = "1";
+    const cleanUrl = fallbackUrl.split("?")[0];
+    imgEl.src = `${cleanUrl}?retry=${Date.now()}`;
+    return;
+  }
+  imgEl.style.opacity = "0";
 }
 
 function recoverVisitorCaseRecord(item) {
@@ -1673,11 +1704,11 @@ function buildCaseCardHTML(p, isVisitor = false) {
   const editable = isVisitor && canEditOrDeleteCase(p);
 
   const deviceImgHTML = (!isVisitor && deviceImgSrc)
-    ? `<img src="${deviceImgSrc}" alt="Proxy Device" onerror="this.style.display='none'" class="w-full h-full object-cover opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10">`
+    ? `<img src="${deviceImgSrc}" alt="Proxy Device" loading="lazy" decoding="async" onerror="handleCardImageError(this, '${deviceImgSrc}')" class="w-full h-full object-cover bg-gray-950 opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10">`
     : '';
 
   const mediaHTML = imgSrc
-    ? `<img src="${imgSrc}" alt="${p.name}" onerror="this.style.display='none'" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 absolute inset-0 z-0">${deviceImgHTML}`
+    ? `<img src="${imgSrc}" alt="${p.name}" loading="eager" decoding="async" onerror="handleCardImageError(this, '${imgSrc}')" class="w-full h-full object-cover bg-gray-950 group-hover:scale-105 transition-all duration-500 absolute inset-0 z-0">${deviceImgHTML}`
     : `<div class="flex flex-col items-center space-y-2 text-gray-700">
         <svg class="w-10 h-10 sm:w-12 sm:h-12 stroke-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -1914,23 +1945,6 @@ function updatePhotoPreviewUI() {
     previewBadge.innerText = isPrivacyBlurEnabled
       ? "✓ 隱私保護已開啟"
       : "✓ 影像已完成黑白曝光調整";
-  }
-}
-
-function syncPrivacyBlurButtonUI() {
-  const btn = document.getElementById('privacy-blur-toggle');
-  const indicator = document.getElementById('privacy-blur-indicator');
-  const label = document.getElementById('privacy-blur-label');
-  if (!btn || !indicator || !label) return;
-
-  if (isPrivacyBlurEnabled) {
-    btn.className = "w-full sm:w-auto px-3.5 py-2 rounded text-xs font-mono inline-flex items-center justify-center gap-2 border transition-all cursor-pointer bg-emerald-950/50 text-emerald-400 border-emerald-500/60";
-    indicator.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
-    label.innerText = "隱私模糊保護：已開啟 (馬賽克遮蔽中)";
-  } else {
-    btn.className = "w-full sm:w-auto px-3.5 py-2 rounded text-xs font-mono inline-flex items-center justify-center gap-2 border transition-all cursor-pointer bg-gray-900/90 text-gray-300 border-gray-700 hover:border-emerald-500/60";
-    indicator.className = "w-2 h-2 rounded-full bg-gray-500";
-    label.innerText = "隱私模糊保護：關閉 (點擊套用馬賽克)";
   }
 }
 
@@ -2198,12 +2212,12 @@ function initVisitorForm() {
   });
 }
 
-/* 定期從雲端同步最新病例（每 3 秒一次） */
+/* 定期從雲端同步最新病例（每 6 秒一次，且僅在頁面可見時執行以降低手機耗電與卡頓） */
 function startCloudSyncPolling() {
   if (!hasFirebaseConfigured()) return;
 
   setInterval(async () => {
-    if (editingCaseId) return;
+    if (document.hidden || editingCaseId) return;
     const cloudCases = await fetchCloudVisitorCases();
     const nextSig = cloudCases.map(p => `${p.id}|${p.name}|${p.statement}|${Boolean(resolveVisitorPhotoSrc(p))}`).join("||");
     if (nextSig !== lastRenderedSignature) {
@@ -2211,7 +2225,7 @@ function startCloudSyncPolling() {
       saveLocalVisitorCases(cloudCases);
       renderPortalCards(true);
     }
-  }, 3000);
+  }, 6000);
 }
 
 /* 定期檢查 3 分鐘編輯時限到期狀態並重新渲染 */
