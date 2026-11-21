@@ -1953,6 +1953,10 @@ function buildCaseCardHTML(p, isVisitor = false, visitorIndex = -1) {
   const displayRole = isVisitor ? getVisitorDisplayRole(p, visitorIndex) : p.role;
   const detailTargetKey = isVisitor ? `visitor:${p.id}` : p.id;
 
+  const caseBadgeTransitionClasses = isVisitor
+    ? ''
+    : 'transition-all duration-300 group-hover:bg-transparent group-hover:backdrop-blur-none group-hover:shadow-none mobile-auto-bg-fade';
+
   const deviceImgHTML = (!isVisitor && deviceImgSrc)
     ? `<img src="${deviceImgSrc}" data-origin-src="${deviceImgSrc}" alt="Proxy Device" referrerpolicy="no-referrer" loading="eager" decoding="sync" onerror="handleCardImageError(this, '${deviceImgSrc}')" class="w-full h-full object-cover bg-gray-950 opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 case-photo-layer absolute inset-0 z-10">`
     : '';
@@ -1980,7 +1984,7 @@ function buildCaseCardHTML(p, isVisitor = false, visitorIndex = -1) {
     >
       <div class="aspect-[3/4] w-full bg-gray-950 relative overflow-hidden flex items-center justify-center">
         <div class="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 pointer-events-none z-30">
-          <span class="text-[10px] sm:text-xs font-mono text-white tracking-wider font-bold bg-black/70 backdrop-blur-md px-2 sm:px-2.5 py-0.5 sm:py-1 rounded shadow-lg inline-block transition-all duration-300 group-hover:bg-transparent group-hover:backdrop-blur-none group-hover:shadow-none mobile-auto-bg-fade">
+          <span class="text-[10px] sm:text-xs font-mono text-white tracking-wider font-bold bg-black/70 backdrop-blur-md px-2 sm:px-2.5 py-0.5 sm:py-1 rounded shadow-lg inline-block ${caseBadgeTransitionClasses}">
             CASE #${displayCaseId}
           </span>
         </div>
