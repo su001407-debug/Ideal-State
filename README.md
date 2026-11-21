@@ -1091,7 +1091,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
         <section class="space-y-1.5">
 
           <h3 class="text-emerald-500 font-mono font-bold text-xs">
-            04. 現場觀眾的參與與延伸檔案
+            04. 現場參與
           </h3>
 
           <p class="text-gray-400">
