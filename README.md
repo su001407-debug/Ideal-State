@@ -515,7 +515,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
           </h2>
 
           <p class="text-xs text-gray-500">
-            跨裝置同步收錄觀眾提交之個人焦慮病例（上傳後 3 分鐘內可於原裝置修改或刪除）
+           同步收錄觀眾提交個人焦慮病例（上傳後 3 分鐘內可於原裝置修改或刪除）
           </p>
         </div>
 
