@@ -143,6 +143,10 @@ body {
   .mobile-auto-fade {
     animation: mobileFade 6s infinite ease-in-out !important;
     will-change: opacity;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
   .mobile-auto-bg-fade {
@@ -150,8 +154,17 @@ body {
   }
 }
 
+.case-photo-layer {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: opacity .35s ease, transform .5s cubic-bezier(.16,1,.3,1);
+}
+
+#detail-slider-container,
 #comparison-slider {
-  touch-action: none;
+  touch-action: pan-y;
 }
 
 .modal-backdrop {
@@ -483,7 +496,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
           </h2>
 
           <p class="text-xs text-gray-500">
-            點擊個案卡片，檢視完整「臨床診斷報告與生命累積呼吸數據」
+           同步收錄觀眾提交個人焦慮病例（上傳後 3 分鐘內可於原裝置修改或刪除）
           </p>
         </div>
 
@@ -515,7 +528,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
           </h2>
 
           <p class="text-xs text-gray-500">
-           同步收錄觀眾提交個人焦慮病例（上傳後 3 分鐘內可於原裝置修改或刪除）
+            跨裝置同步收錄觀眾提交之個人焦慮病例（上傳後 3 分鐘內可於原裝置修改或刪除）
           </p>
         </div>
 
@@ -789,8 +802,8 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
 
         </div>
 
-        <p class="text-[10px] font-mono text-gray-400 tracking-wide pb-1">
-         
+        <p id="detail-hair-removal-note" class="text-[10px] font-mono text-gray-400 tracking-wide pb-1">
+          Hair removed during proxy process
         </p>
 
       </div>
@@ -829,7 +842,9 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
             id="detail-visitor-img"
             src=""
             alt="Visitor Portrait"
-            class="hidden w-full h-full object-cover absolute inset-0 z-10 pointer-events-none"
+            referrerpolicy="no-referrer"
+            decoding="sync"
+            class="hidden w-full h-full object-cover absolute inset-0 z-10 pointer-events-none case-photo-layer"
           >
 
           <!-- 原始四位委託人專用結構 -->
@@ -837,7 +852,9 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
             id="detail-device-img"
             src=""
             alt="Proxy Device"
-            class="w-full h-full object-cover absolute inset-0 pointer-events-none z-0"
+            referrerpolicy="no-referrer"
+            decoding="sync"
+            class="w-full h-full object-cover absolute inset-0 pointer-events-none z-0 case-photo-layer"
           >
 
           <div
@@ -848,7 +865,9 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
               id="detail-principal-img"
               src=""
               alt="Principal"
-              class="w-full h-full object-cover pointer-events-none"
+              referrerpolicy="no-referrer"
+              decoding="sync"
+              class="w-full h-full object-cover pointer-events-none case-photo-layer"
               style="max-width:none;"
             >
           </div>
@@ -1000,7 +1019,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
         </div>
 
         <div class="flex items-center justify-center min-w-[160px] h-[120px] relative overflow-hidden shrink-0">
-          <img id="detail-signature-img" src="" alt="Principal Signature" class="max-h-28 max-w-[180px] object-contain opacity-95 mix-blend-screen hidden">
+          <img id="detail-signature-img" src="" alt="Principal Signature" referrerpolicy="no-referrer" decoding="async" class="max-h-28 max-w-[180px] object-contain opacity-95 mix-blend-screen hidden">
           <span id="detail-signature-placeholder" class="text-[10px] text-gray-600 tracking-widest">
             PENDING SEAL
           </span>
@@ -1072,7 +1091,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
         <section class="space-y-1.5">
 
           <h3 class="text-emerald-500 font-mono font-bold text-xs">
-            04. 現場觀眾的參與與延伸檔案
+            04. 現場參與
           </h3>
 
           <p class="text-gray-400">
@@ -1233,6 +1252,126 @@ let lastRenderedSignature = "";
 
 let VISITOR_PARTICIPANTS = loadLocalVisitorCases();
 let breathTimer = null;
+const PRELOADED_IMAGE_CACHE = new Map();
+
+function preloadImageWithRetry(url, maxRetries = 4) {
+  const cleanUrl = formatImageSrc(url);
+  if (!cleanUrl) return Promise.resolve("");
+  if (cleanUrl.startsWith("data:image/")) return Promise.resolve(cleanUrl);
+  if (PRELOADED_IMAGE_CACHE.has(cleanUrl)) {
+    return PRELOADED_IMAGE_CACHE.get(cleanUrl);
+  }
+
+  const task = new Promise((resolve) => {
+    let attempt = 0;
+
+    function tryFetch() {
+      const loader = new Image();
+      loader.referrerPolicy = "no-referrer";
+      loader.decoding = "sync";
+
+      loader.onload = function() {
+        if (loader.naturalWidth > 0 && loader.naturalHeight > 0) {
+          resolve(loader.src);
+        } else if (attempt < maxRetries) {
+          attempt += 1;
+          setTimeout(tryFetch, 350 * attempt);
+        } else {
+          resolve(cleanUrl);
+        }
+      };
+
+      loader.onerror = function() {
+        if (attempt < maxRetries) {
+          attempt += 1;
+          setTimeout(tryFetch, 400 * attempt);
+        } else {
+          resolve(cleanUrl);
+        }
+      };
+
+      const base = cleanUrl.split("?")[0];
+      loader.src = attempt === 0 ? cleanUrl : `${base}?r=${attempt}&t=${Date.now()}`;
+    }
+
+    tryFetch();
+  });
+
+  PRELOADED_IMAGE_CACHE.set(cleanUrl, task);
+  return task;
+}
+
+function warmUpAllBaseAssets() {
+  BASE_PARTICIPANTS.forEach(p => {
+    if (p.imageUrl) preloadImageWithRetry(p.imageUrl);
+    if (p.deviceImageUrl) preloadImageWithRetry(p.deviceImageUrl);
+    if (p.signatureUrl) preloadImageWithRetry(p.signatureUrl);
+  });
+}
+
+function bindResilientImage(imgEl, rawUrl, options = {}) {
+  const {
+    onAllFailed = null,
+    onLoaded = null,
+    maxRetries = 4
+  } = options;
+
+  const cleanUrl = formatImageSrc(rawUrl);
+  if (!imgEl) return;
+
+  if (!cleanUrl) {
+    imgEl.removeAttribute("src");
+    if (typeof onAllFailed === "function") onAllFailed();
+    return;
+  }
+
+  imgEl.referrerPolicy = "no-referrer";
+  imgEl.decoding = "sync";
+
+  let attempt = 0;
+  const loadToken = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  imgEl.dataset.loadToken = loadToken;
+
+  function applySrc(targetSrc) {
+    if (imgEl.dataset.loadToken !== loadToken) return;
+    imgEl.src = targetSrc;
+  }
+
+  imgEl.onload = function() {
+    if (imgEl.dataset.loadToken !== loadToken) return;
+    if (imgEl.naturalWidth > 0 && imgEl.naturalHeight > 0) {
+      imgEl.style.opacity = "";
+      if (typeof onLoaded === "function") onLoaded(imgEl);
+    } else if (attempt < maxRetries) {
+      attempt += 1;
+      const base = cleanUrl.split("?")[0];
+      setTimeout(() => applySrc(`${base}?r=${attempt}&t=${Date.now()}`), 350 * attempt);
+    } else if (typeof onAllFailed === "function") {
+      onAllFailed();
+    }
+  };
+
+  imgEl.onerror = function() {
+    if (imgEl.dataset.loadToken !== loadToken) return;
+    if (attempt < maxRetries) {
+      attempt += 1;
+      const base = cleanUrl.split("?")[0];
+      setTimeout(() => applySrc(`${base}?r=${attempt}&t=${Date.now()}`), 400 * attempt);
+    } else if (typeof onAllFailed === "function") {
+      onAllFailed();
+    }
+  };
+
+  if (cleanUrl.startsWith("data:image/")) {
+    applySrc(cleanUrl);
+    return;
+  }
+
+  preloadImageWithRetry(cleanUrl, maxRetries).then((resolvedSrc) => {
+    if (imgEl.dataset.loadToken !== loadToken) return;
+    applySrc(resolvedSrc || cleanUrl);
+  });
+}
 
 function formatImageSrc(url) {
   if (!url || typeof url !== "string") return "";
@@ -1248,14 +1387,34 @@ function formatImageSrc(url) {
 }
 
 function handleCardImageError(imgEl, fallbackUrl) {
-  if (!imgEl) return;
-  if (!imgEl.dataset.retried && fallbackUrl) {
-    imgEl.dataset.retried = "1";
+  if (!imgEl || !fallbackUrl) return;
+  const retries = Number(imgEl.dataset.retryCount || "0");
+  if (retries < 4) {
+    const nextRetry = retries + 1;
+    imgEl.dataset.retryCount = String(nextRetry);
+    imgEl.referrerPolicy = "no-referrer";
     const cleanUrl = fallbackUrl.split("?")[0];
-    imgEl.src = `${cleanUrl}?retry=${Date.now()}`;
+    setTimeout(() => {
+      imgEl.src = `${cleanUrl}?retry=${nextRetry}&t=${Date.now()}`;
+    }, 350 * nextRetry);
     return;
   }
   imgEl.style.opacity = "0";
+}
+
+function verifyAllVisibleCardImages() {
+  const imgs = document.querySelectorAll('#cards-container img, #visitor-cards-container img');
+  imgs.forEach(img => {
+    const originalSrc = img.dataset.originSrc || img.getAttribute('src') || '';
+    if (!originalSrc) return;
+    if (img.complete && img.naturalWidth === 0) {
+      handleCardImageError(img, originalSrc);
+    }
+  });
+}
+
+function verifyCardImagesLoaded() {
+  verifyAllVisibleCardImages();
 }
 
 function recoverVisitorCaseRecord(item) {
@@ -1424,6 +1583,9 @@ async function fetchCloudVisitorCases() {
     }).filter(Boolean);
 
     list.sort((a, b) => {
+      const ta = Number(a.createdAt) || 0;
+      const tb = Number(b.createdAt) || 0;
+      if (ta !== tb) return ta - tb;
       const na = parseInt(a.id, 10) || 0;
       const nb = parseInt(b.id, 10) || 0;
       return na - nb;
@@ -1643,6 +1805,7 @@ function updateImgDimensions() {
 }
 
 function initComparisonSlider() {
+  const sliderContainer = document.getElementById('detail-slider-container');
   const slider = document.getElementById('comparison-slider');
   const clipWrapper = document.getElementById('slider-clip-wrapper');
   const sliderLine = document.getElementById('slider-line');
@@ -1653,11 +1816,13 @@ function initComparisonSlider() {
     "absolute bottom-2.5 text-[9px] font-mono backdrop-blur px-2.5 py-1 rounded transition-all duration-300 z-20 pointer-events-none";
 
   function updateSlider(val) {
-    clipWrapper.style.width = `${val}%`;
-    sliderLine.style.left = `${val}%`;
+    const clamped = Math.max(0, Math.min(100, Number(val)));
+    slider.value = clamped;
+    clipWrapper.style.width = `${clamped}%`;
+    sliderLine.style.left = `${clamped}%`;
 
-    const principalActive = val > 55;
-    const deviceActive = val < 45;
+    const principalActive = clamped > 55;
+    const deviceActive = clamped < 45;
 
     badgePrincipal.className =
       `${badgeBase} left-2.5 ` +
@@ -1671,6 +1836,54 @@ function initComparisonSlider() {
   slider.addEventListener('input', e => {
     updateSlider(e.target.value);
   });
+
+  // 手機觸控優化：上下滑動優先讓頁面捲動，明顯左右拖曳才切換對比滑桿
+  if (sliderContainer) {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isHorizontalDrag = null;
+
+    function applyTouchPosition(clientX) {
+      const rect = sliderContainer.getBoundingClientRect();
+      if (!rect.width) return;
+      const ratio = ((clientX - rect.left) / rect.width) * 100;
+      updateSlider(ratio);
+    }
+
+    sliderContainer.addEventListener('touchstart', e => {
+      if (!e.touches || e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      isHorizontalDrag = null;
+    }, { passive: true });
+
+    sliderContainer.addEventListener('touchmove', e => {
+      if (!e.touches || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+
+      if (isHorizontalDrag === null) {
+        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        isHorizontalDrag = Math.abs(dx) > Math.abs(dy) * 1.15;
+      }
+
+      if (isHorizontalDrag) {
+        if (e.cancelable) e.preventDefault();
+        applyTouchPosition(e.touches[0].clientX);
+      }
+    }, { passive: false });
+
+    sliderContainer.addEventListener('touchend', e => {
+      if (isHorizontalDrag === null && e.changedTouches && e.changedTouches.length === 1) {
+        const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
+        const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+        if (dx < 8 && dy < 8) {
+          applyTouchPosition(e.changedTouches[0].clientX);
+        }
+      }
+      isHorizontalDrag = null;
+    }, { passive: true });
+  }
 
   window.addEventListener('resize', updateImgDimensions);
   updateImgDimensions();
@@ -1741,11 +1954,11 @@ function buildCaseCardHTML(p, isVisitor = false, visitorIndex = -1) {
   const detailTargetKey = isVisitor ? `visitor:${p.id}` : p.id;
 
   const deviceImgHTML = (!isVisitor && deviceImgSrc)
-    ? `<img src="${deviceImgSrc}" alt="Proxy Device" loading="eager" decoding="async" onerror="handleCardImageError(this, '${deviceImgSrc}')" class="w-full h-full object-cover bg-gray-950 opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10">`
+    ? `<img src="${deviceImgSrc}" data-origin-src="${deviceImgSrc}" alt="Proxy Device" referrerpolicy="no-referrer" loading="eager" decoding="sync" onerror="handleCardImageError(this, '${deviceImgSrc}')" class="w-full h-full object-cover bg-gray-950 opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 case-photo-layer absolute inset-0 z-10">`
     : '';
 
   const mediaHTML = imgSrc
-    ? `<img src="${imgSrc}" alt="${p.name}" loading="eager" decoding="async" onerror="handleCardImageError(this, '${imgSrc}')" class="w-full h-full object-cover bg-gray-950 group-hover:scale-105 transition-all duration-500 absolute inset-0 z-0">${deviceImgHTML}`
+    ? `<img src="${imgSrc}" data-origin-src="${imgSrc}" alt="${p.name}" referrerpolicy="no-referrer" loading="eager" decoding="sync" onerror="handleCardImageError(this, '${imgSrc}')" class="w-full h-full object-cover bg-gray-950 group-hover:scale-105 case-photo-layer absolute inset-0 z-0">${deviceImgHTML}`
     : `<div class="flex flex-col items-center space-y-2 text-gray-700">
         <svg class="w-10 h-10 sm:w-12 sm:h-12 stroke-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -1831,6 +2044,7 @@ function renderPortalCards(force = false) {
   }
 
   updateCaseCountersUI();
+  setTimeout(verifyAllVisibleCardImages, 1500);
 }
 
 /* 觀眾影像處理：黑白灰階 + 曝光微調 + 可切換隱私模糊保護 */
@@ -2219,6 +2433,7 @@ function initVisitorForm() {
 
     const newCase = {
       id: storageId,
+      seqIndex: nextVisitorSeq,
       name: resolvedName,
       role: `現場延伸病例 ${nextVisitorDisplayId} 號`,
       target: `${resolvedName} (本體)`,
@@ -2350,22 +2565,35 @@ function showDetail(id) {
   const principalImg = document.getElementById('detail-principal-img');
   const deviceImg = document.getElementById('detail-device-img');
   const noImgFallback = document.getElementById('detail-no-image-fallback');
+  const hairRemovalNote = document.getElementById('detail-hair-removal-note');
+
+  if (hairRemovalNote) {
+    if (isVisitorCase) {
+      hairRemovalNote.classList.add('hidden');
+    } else {
+      hairRemovalNote.classList.remove('hidden');
+    }
+  }
 
   applyDetailLeftMode(isVisitorCase);
 
   if (isVisitorCase) {
     const vUrl = resolveVisitorPhotoSrc(data);
-    visitorImg.onerror = function() {
-      visitorImg.classList.add('hidden');
-      if (noImgFallback) noImgFallback.classList.remove('hidden');
-    };
-
     if (vUrl) {
-      visitorImg.src = vUrl;
       visitorImg.classList.remove('hidden');
       if (noImgFallback) noImgFallback.classList.add('hidden');
+      bindResilientImage(visitorImg, vUrl, {
+        onLoaded: () => {
+          visitorImg.classList.remove('hidden');
+          if (noImgFallback) noImgFallback.classList.add('hidden');
+        },
+        onAllFailed: () => {
+          visitorImg.classList.add('hidden');
+          if (noImgFallback) noImgFallback.classList.remove('hidden');
+        }
+      });
     } else {
-      visitorImg.src = '';
+      visitorImg.removeAttribute('src');
       visitorImg.classList.add('hidden');
       if (noImgFallback) noImgFallback.classList.remove('hidden');
     }
@@ -2373,21 +2601,47 @@ function showDetail(id) {
     const pUrl = formatImageSrc(data.imageUrl);
     const dUrl = formatImageSrc(data.deviceImageUrl || data.imageUrl);
 
-    principalImg.onerror = function() {
-      principalImg.classList.add('hidden');
-      deviceImg.classList.add('hidden');
-      if (noImgFallback) noImgFallback.classList.remove('hidden');
-    };
-
     if (pUrl) {
-      principalImg.src = pUrl;
-      deviceImg.src = dUrl;
+      let pFailed = false;
+      let dFailed = false;
+
       principalImg.classList.remove('hidden');
       deviceImg.classList.remove('hidden');
       if (noImgFallback) noImgFallback.classList.add('hidden');
+
+      bindResilientImage(principalImg, pUrl, {
+        onLoaded: () => {
+          pFailed = false;
+          principalImg.classList.remove('hidden');
+          if (noImgFallback) noImgFallback.classList.add('hidden');
+          updateImgDimensions();
+        },
+        onAllFailed: () => {
+          pFailed = true;
+          principalImg.classList.add('hidden');
+          if (pFailed && dFailed && noImgFallback) {
+            noImgFallback.classList.remove('hidden');
+          }
+        }
+      });
+
+      bindResilientImage(deviceImg, dUrl, {
+        onLoaded: () => {
+          dFailed = false;
+          deviceImg.classList.remove('hidden');
+          if (noImgFallback) noImgFallback.classList.add('hidden');
+        },
+        onAllFailed: () => {
+          dFailed = true;
+          deviceImg.classList.add('hidden');
+          if (pFailed && dFailed && noImgFallback) {
+            noImgFallback.classList.remove('hidden');
+          }
+        }
+      });
     } else {
-      principalImg.src = '';
-      deviceImg.src = '';
+      principalImg.removeAttribute('src');
+      deviceImg.removeAttribute('src');
       principalImg.classList.add('hidden');
       deviceImg.classList.add('hidden');
       if (noImgFallback) noImgFallback.classList.remove('hidden');
@@ -2397,11 +2651,16 @@ function showDetail(id) {
   const sigImg = document.getElementById('detail-signature-img');
   const sigPlaceholder = document.getElementById('detail-signature-placeholder');
   if (data.signatureUrl) {
-    sigImg.src = formatImageSrc(data.signatureUrl);
     sigImg.classList.remove('hidden');
     sigPlaceholder.classList.add('hidden');
+    bindResilientImage(sigImg, data.signatureUrl, {
+      onAllFailed: () => {
+        sigImg.classList.add('hidden');
+        sigPlaceholder.classList.remove('hidden');
+      }
+    });
   } else {
-    sigImg.src = '';
+    sigImg.removeAttribute('src');
     sigImg.classList.add('hidden');
     sigPlaceholder.classList.remove('hidden');
   }
@@ -2423,12 +2682,15 @@ function showDetail(id) {
 
 /* 初始化 */
 window.addEventListener('DOMContentLoaded', async () => {
+  warmUpAllBaseAssets();
   syncPrivacyBlurButtonUI();
   renderPortalCards(true);
   initComparisonSlider();
   startOutputFluctuationWithPause();
   initVisitorForm();
   startEditWindowTicker();
+  setTimeout(verifyAllVisibleCardImages, 1500);
+  setTimeout(verifyAllVisibleCardImages, 4000);
 
   if (hasFirebaseConfigured()) {
     const cloudCases = await fetchCloudVisitorCases();
@@ -2449,6 +2711,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (targetId) {
     showDetail(targetId);
   }
+});
+
+window.addEventListener('pageshow', () => {
+  warmUpAllBaseAssets();
+  verifyAllVisibleCardImages();
 });
 </script>
 
