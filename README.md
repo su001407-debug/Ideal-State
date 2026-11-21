@@ -139,13 +139,14 @@ body {
   }
 }
 
-@media (hover: none) {
+@media (hover: none), (max-width: 767px) {
   .mobile-auto-fade {
-    animation: mobileFade 6s infinite ease-in-out;
+    animation: mobileFade 6s infinite ease-in-out !important;
+    will-change: opacity;
   }
 
   .mobile-auto-bg-fade {
-    animation: mobileBgFade 6s infinite ease-in-out;
+    animation: mobileBgFade 6s infinite ease-in-out !important;
   }
 }
 
@@ -789,7 +790,7 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
         </div>
 
         <p class="text-[10px] font-mono text-gray-400 tracking-wide pb-1">
-          
+          [SYSTEM NOTE] 個人特徵（髮型/皮肉）已於代理化過程中剝離。
         </p>
 
       </div>
@@ -1071,11 +1072,11 @@ input[type="date"].clinical-input::-webkit-date-and-time-value {
         <section class="space-y-1.5">
 
           <h3 class="text-emerald-500 font-mono font-bold text-xs">
-            04. 現場邀請參與
+            04. 現場觀眾的參與與延伸檔案
           </h3>
 
           <p class="text-gray-400">
-            除了既有的四組委託人檔案之外，本檔案系統也開放現場觀眾即時參與，讓觀者得以自行登錄並建立屬於自己的延伸病例檔案。觀眾可透過手中的裝置寫下面對空閒與無產出狀態時的「本體焦慮自白紀錄」。這些由現場觀眾自主提交的病例，會即時同步匯入《理想狀態》的公共檔案目錄之中，使這份關於生產力焦慮與呼吸存在證明的臨床紀錄，隨著每一位觀者的加入而不斷擴張。
+            除了既有的四組委託人檔案之外，本檔案系統亦開放現場觀眾即時參與，讓觀者得以自行登錄並建立屬於自己的延伸病例檔案。觀眾可透過現場終端寫下面對空閒與無產出狀態時的「本體焦慮自白紀錄」、輸入出生日期以即時計算生命累積呼吸數，並可選擇拍攝或上傳影像（搭配隱私馬賽克保護功能）。這些由現場觀眾自主提交的病例，會即時同步匯入《理想狀態》的公共檔案目錄之中，使這份關於生產力焦慮與呼吸存在證明的臨床紀錄，隨著每一位觀者的加入而不斷擴張。
           </p>
 
         </section>
@@ -1132,7 +1133,7 @@ const BASE_PARTICIPANTS = [
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-96d3b302-64c7-4d0a-92c3-dae869f734ea.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-10-27-116824ad-2295-48ab-bfc1-92ff1656d47d.jpg",
     signatureUrl: "https://cdn.phototourl.com/member/2026-11-12-7dcaeab3-e243-42a6-b786-45621df6d49b.png",
-    statement: "我發現自己根本無法忍受純粹的放空。只要一停下來，那種『時間正被浪費』的罪惡感就會把我吞噬。我停不下來——我需要讓腦袋不停的思考。"
+    statement: "我發現自己根本無法忍受純粹的放空。只要一停下來，那種『時間正被浪費』的罪惡感就會把我吞噬。我做這個替身，不是為了讓自己舒服地去休息，而是因為我停不下來——我需要一個實體掛在那裡，替我承擔什麼都不做、只剩下呼吸的死寂。"
   },
   {
     id: "02",
@@ -1156,7 +1157,7 @@ const BASE_PARTICIPANTS = [
     imageUrl: "https://cdn.phototourl.com/member/2026-10-25-b70cd799-0bbf-4737-a890-d4c0962fe741.jpg",
     deviceImageUrl: "https://cdn.phototourl.com/member/2026-10-27-4e230bf1-0d8a-429f-b28d-9e4734ace26d.jpg",
     signatureUrl: "",
-    statement: "壓力來時，既要照常過日子，又要安撫腦中的聲音，悶得說不出口，像梅雨天關著窗的房間，連呼吸都潮濕沉重。"
+    statement: "休假對我來說不是放鬆，而是一場審判。躺在床上滑手機的每一分鐘，都在盤算著自己少做了多少事。如果一定要有人在那裡放空，那就讓這顆塑膠薄膜包覆的人頭替我坐牢吧。"
   },
   {
     id: "04",
@@ -1462,6 +1463,41 @@ function getAllParticipants() {
   return [...BASE_PARTICIPANTS, ...VISITOR_PARTICIPANTS];
 }
 
+function getVisitorDisplayId(caseItem, index = -1) {
+  if (!caseItem) return "01";
+  const resolvedIndex = index >= 0
+    ? index
+    : VISITOR_PARTICIPANTS.findIndex(p => p.id === caseItem.id);
+  if (resolvedIndex >= 0) {
+    return String(resolvedIndex + 1).padStart(2, '0');
+  }
+  const n = parseInt(caseItem.id, 10);
+  if (!isNaN(n) && n > BASE_PARTICIPANTS.length) {
+    return String(n - BASE_PARTICIPANTS.length).padStart(2, '0');
+  }
+  return String(caseItem.id || "01").padStart(2, '0');
+}
+
+function getVisitorCaseNumber(caseItem, index = -1) {
+  if (!caseItem) return String(BASE_PARTICIPANTS.length + 1).padStart(2, '0');
+  const resolvedIndex = index >= 0
+    ? index
+    : VISITOR_PARTICIPANTS.findIndex(p => p.id === caseItem.id);
+  if (resolvedIndex >= 0) {
+    return String(BASE_PARTICIPANTS.length + resolvedIndex + 1).padStart(2, '0');
+  }
+  const n = parseInt(caseItem.id, 10);
+  if (!isNaN(n)) {
+    return String(n).padStart(2, '0');
+  }
+  return String(BASE_PARTICIPANTS.length + 1).padStart(2, '0');
+}
+
+function getVisitorDisplayRole(caseItem, index = -1) {
+  const displayId = getVisitorDisplayId(caseItem, index);
+  return `現場延伸病例 ${displayId} 號`;
+}
+
 function isVisitorCaseById(id) {
   return VISITOR_PARTICIPANTS.some(p => p.id === id);
 }
@@ -1497,13 +1533,11 @@ function updateCaseCountersUI() {
 
   if (nextPreview) {
     if (editingCaseId) {
-      nextPreview.innerText = `EDITING ID: CASE #${editingCaseId}`;
+      const editIdx = VISITOR_PARTICIPANTS.findIndex(p => p.id === editingCaseId);
+      const editCaseNum = editIdx >= 0 ? getVisitorCaseNumber(VISITOR_PARTICIPANTS[editIdx], editIdx) : editingCaseId;
+      nextPreview.innerText = `EDITING ID: CASE #${editCaseNum}`;
     } else {
-      const maxNum = VISITOR_PARTICIPANTS.reduce((max, item) => {
-        const n = parseInt(item.id, 10);
-        return !isNaN(n) && n > max ? n : max;
-      }, BASE_PARTICIPANTS.length);
-      const nextNum = String(maxNum + 1).padStart(2, '0');
+      const nextNum = String(BASE_PARTICIPANTS.length + VISITOR_PARTICIPANTS.length + 1).padStart(2, '0');
       nextPreview.innerText = `NEXT ID: CASE #${nextNum}`;
     }
   }
@@ -1698,13 +1732,16 @@ function applyDetailLeftMode(isVisitorCase) {
 }
 
 /* 單張卡片模板 */
-function buildCaseCardHTML(p, isVisitor = false) {
+function buildCaseCardHTML(p, isVisitor = false, visitorIndex = -1) {
   const imgSrc = isVisitor ? resolveVisitorPhotoSrc(p) : formatImageSrc(p.imageUrl);
   const deviceImgSrc = formatImageSrc(p.deviceImageUrl || p.imageUrl);
   const editable = isVisitor && canEditOrDeleteCase(p);
+  const displayCaseId = isVisitor ? getVisitorCaseNumber(p, visitorIndex) : p.id;
+  const displayRole = isVisitor ? getVisitorDisplayRole(p, visitorIndex) : p.role;
+  const detailTargetKey = isVisitor ? `visitor:${p.id}` : p.id;
 
   const deviceImgHTML = (!isVisitor && deviceImgSrc)
-    ? `<img src="${deviceImgSrc}" alt="Proxy Device" loading="lazy" decoding="async" onerror="handleCardImageError(this, '${deviceImgSrc}')" class="w-full h-full object-cover bg-gray-950 opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10">`
+    ? `<img src="${deviceImgSrc}" alt="Proxy Device" loading="eager" decoding="async" onerror="handleCardImageError(this, '${deviceImgSrc}')" class="w-full h-full object-cover bg-gray-950 opacity-0 group-hover:opacity-100 mobile-auto-fade group-hover:scale-105 transition-all duration-500 absolute inset-0 z-10">`
     : '';
 
   const mediaHTML = imgSrc
@@ -1725,13 +1762,13 @@ function buildCaseCardHTML(p, isVisitor = false) {
 
   return `
     <div
-      onclick="showDetail('${p.id}')"
+      onclick="showDetail('${detailTargetKey}')"
       class="glass-card rounded-xl overflow-hidden cursor-pointer flex flex-col justify-between relative group"
     >
       <div class="aspect-[3/4] w-full bg-gray-950 relative overflow-hidden flex items-center justify-center">
         <div class="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 pointer-events-none z-30">
           <span class="text-[10px] sm:text-xs font-mono text-white tracking-wider font-bold bg-black/70 backdrop-blur-md px-2 sm:px-2.5 py-0.5 sm:py-1 rounded shadow-lg inline-block transition-all duration-300 group-hover:bg-transparent group-hover:backdrop-blur-none group-hover:shadow-none mobile-auto-bg-fade">
-            CASE #${p.id}
+            CASE #${displayCaseId}
           </span>
         </div>
 
@@ -1744,7 +1781,7 @@ function buildCaseCardHTML(p, isVisitor = false) {
             ${p.name}
           </h3>
           <p class="text-[10px] sm:text-xs text-gray-300 font-mono truncate">
-            ${p.role}
+            ${displayRole}
           </p>
         </div>
 
@@ -1789,7 +1826,7 @@ function renderPortalCards(force = false) {
         </div>
       `;
     } else {
-      visitorContainer.innerHTML = VISITOR_PARTICIPANTS.map(p => buildCaseCardHTML(p, true)).join('');
+      visitorContainer.innerHTML = VISITOR_PARTICIPANTS.map((p, idx) => buildCaseCardHTML(p, true, idx)).join('');
     }
   }
 
@@ -2010,6 +2047,9 @@ function startEditVisitorCase(id) {
   editingCaseId = id;
   showPortal();
 
+  const editIdx = VISITOR_PARTICIPANTS.findIndex(p => p.id === id);
+  const editCaseNum = getVisitorCaseNumber(target, editIdx);
+
   document.getElementById('visitor-statement').value = target.statement || "";
   document.getElementById('visitor-name').value = target.name || "";
   document.getElementById('visitor-birth').value = target.birthDate || "";
@@ -2027,10 +2067,10 @@ function startEditVisitorCase(id) {
     clearCapturedPhoto();
   }
 
-  document.getElementById('form-mode-title').innerText = `修改病例檔案：CASE #${id}`;
+  document.getElementById('form-mode-title').innerText = `修改病例檔案：CASE #${editCaseNum}`;
   document.getElementById('submit-case-btn-text').innerText = "儲存病例修改";
   document.getElementById('cancel-edit-btn').classList.remove('hidden');
-  document.getElementById('visitor-form-feedback').innerText = `正在編輯 CASE #${id}（僅限建立後 3 分鐘內修改）`;
+  document.getElementById('visitor-form-feedback').innerText = `正在編輯 CASE #${editCaseNum}（僅限建立後 3 分鐘內修改）`;
 
   updateCaseCountersUI();
 
@@ -2056,13 +2096,15 @@ function cancelEditMode() {
 }
 
 async function deleteVisitorCase(id) {
-  const target = VISITOR_PARTICIPANTS.find(p => p.id === id);
+  const targetIdx = VISITOR_PARTICIPANTS.findIndex(p => p.id === id);
+  const target = targetIdx >= 0 ? VISITOR_PARTICIPANTS[targetIdx] : null;
   if (!target || !canEditOrDeleteCase(target)) {
     showToast("此病例已超過 3 分鐘刪除時限，或非原上傳裝置建立之檔案。");
     renderPortalCards(true);
     return;
   }
 
+  const deletedCaseNum = getVisitorCaseNumber(target, targetIdx);
   VISITOR_PARTICIPANTS = VISITOR_PARTICIPANTS.filter(p => p.id !== id);
   const syncResult = await syncVisitorCasesToCloud(VISITOR_PARTICIPANTS);
 
@@ -2072,13 +2114,13 @@ async function deleteVisitorCase(id) {
 
   renderPortalCards(true);
 
-  if (currentDetailCaseId === id) {
+  if (currentDetailCaseId === id || currentDetailCaseId === `visitor:${id}`) {
     showPortal();
   }
 
   const msg = syncResult.ok
-    ? `已從雲端刪除病例 CASE #${id}（全裝置已同步）。`
-    : `已刪除病例 CASE #${id}（雲端連線異常，已於本機更新）。`;
+    ? `已從雲端刪除病例 CASE #${deletedCaseNum}（全裝置已同步）。`
+    : `已刪除病例 CASE #${deletedCaseNum}（雲端連線異常，已於本機更新）。`;
 
   showToast(msg);
   const feedback = document.getElementById('visitor-form-feedback');
@@ -2154,12 +2196,12 @@ function initVisitorForm() {
       };
 
       const syncResult = await syncVisitorCasesToCloud(VISITOR_PARTICIPANTS);
-      const updatedId = existing.id;
+      const updatedCaseNum = getVisitorCaseNumber(VISITOR_PARTICIPANTS[idx], idx);
       cancelEditMode();
       renderPortalCards(true);
       feedback.textContent = syncResult.ok
-        ? `已更新病例 CASE #${updatedId}（${resolvedName}）並同步至所有裝置。`
-        : `已更新病例 CASE #${updatedId}（雲端連線異常，已暫存於本機）。`;
+        ? `已更新病例 CASE #${updatedCaseNum}（${resolvedName}）並同步至所有裝置。`
+        : `已更新病例 CASE #${updatedCaseNum}（雲端連線異常，已暫存於本機）。`;
       return;
     }
 
@@ -2168,20 +2210,17 @@ function initVisitorForm() {
       VISITOR_PARTICIPANTS = latestCloud;
     }
 
-    const maxNum = VISITOR_PARTICIPANTS.reduce((max, item) => {
-      const n = parseInt(item.id, 10);
-      return !isNaN(n) && n > max ? n : max;
-    }, BASE_PARTICIPANTS.length);
-
-    const nextNum = maxNum + 1;
-    const nextId = String(nextNum).padStart(2, '0');
-    const resolvedName = nameInput || `現場委託人 #${nextId}`;
+    const nextVisitorSeq = VISITOR_PARTICIPANTS.length + 1;
+    const nextVisitorDisplayId = String(nextVisitorSeq).padStart(2, '0');
+    const nextOverallCaseNum = String(BASE_PARTICIPANTS.length + nextVisitorSeq).padStart(2, '0');
+    const storageId = `V-${Date.now().toString(36)}-${nextVisitorDisplayId}`;
+    const resolvedName = nameInput || `現場委託人 #${nextVisitorDisplayId}`;
     const resolvedBirth = birthInput;
 
     const newCase = {
-      id: nextId,
+      id: storageId,
       name: resolvedName,
-      role: `現場延伸病例 ${nextId} 號`,
+      role: `現場延伸病例 ${nextVisitorDisplayId} 號`,
       target: `${resolvedName} (本體)`,
       anxiety: anxietyInput || "85.0% (現場登錄)",
       birthDate: resolvedBirth,
@@ -2205,9 +2244,9 @@ function initVisitorForm() {
     clearCapturedPhoto();
 
     if (syncResult.ok) {
-      feedback.textContent = `已建立病例 CASE #${nextId}（${resolvedName}）並同步至雲端，3 分鐘內可於本裝置修改或刪除。`;
+      feedback.textContent = `已建立病例 CASE #${nextOverallCaseNum}（${resolvedName}）並同步至雲端，3 分鐘內可於本裝置修改或刪除。`;
     } else {
-      feedback.textContent = `已建立病例 CASE #${nextId}（${resolvedName}），雲端連線異常，請確認 Firebase 測試規則權限。`;
+      feedback.textContent = `已建立病例 CASE #${nextOverallCaseNum}（${resolvedName}），雲端連線異常，請確認 Firebase 測試規則權限。`;
     }
   });
 }
@@ -2267,30 +2306,39 @@ function updateDetailOwnerControls(id) {
   const editBtn = document.getElementById('detail-edit-btn');
   const deleteBtn = document.getElementById('detail-delete-btn');
 
-  const visitorItem = VISITOR_PARTICIPANTS.find(p => p.id === id);
+  const rawId = typeof id === 'string' && id.startsWith('visitor:') ? id.slice(8) : id;
+  const visitorItem = VISITOR_PARTICIPANTS.find(p => p.id === rawId);
   if (visitorItem && canEditOrDeleteCase(visitorItem)) {
     const remain = getRemainingEditSeconds(visitorItem);
     controlsEl.classList.remove('hidden');
     countdownEl.innerText = `可編輯剩餘 ${formatSecondsMMSS(remain)}`;
-    editBtn.onclick = () => startEditVisitorCase(id);
-    deleteBtn.onclick = () => deleteVisitorCase(id);
+    editBtn.onclick = () => startEditVisitorCase(rawId);
+    deleteBtn.onclick = () => deleteVisitorCase(rawId);
   } else {
     controlsEl.classList.add('hidden');
   }
 }
 
 function showDetail(id) {
-  const allCases = getAllParticipants();
-  const data = allCases.find(p => p.id === id) || BASE_PARTICIPANTS[0];
-  currentDetailCaseId = data.id;
-  const isVisitorCase = isVisitorCaseById(data.id);
+  const isExplicitVisitor = typeof id === 'string' && id.startsWith('visitor:');
+  const lookupId = isExplicitVisitor ? id.slice(8) : id;
+  const visitorIdx = VISITOR_PARTICIPANTS.findIndex(p => p.id === lookupId);
+  const isVisitorCase = isExplicitVisitor || (!BASE_PARTICIPANTS.some(p => p.id === lookupId) && visitorIdx >= 0);
+
+  const data = isVisitorCase
+    ? (VISITOR_PARTICIPANTS[visitorIdx] || VISITOR_PARTICIPANTS[0] || BASE_PARTICIPANTS[0])
+    : (BASE_PARTICIPANTS.find(p => p.id === lookupId) || BASE_PARTICIPANTS[0]);
+
+  currentDetailCaseId = isVisitorCase ? `visitor:${data.id}` : data.id;
+  const displayCaseId = isVisitorCase ? getVisitorCaseNumber(data, visitorIdx) : data.id;
+  const displayRole = isVisitorCase ? getVisitorDisplayRole(data, visitorIdx) : data.role;
 
   document.getElementById('header-output-box').style.display = 'none';
-  updateDetailOwnerControls(data.id);
+  updateDetailOwnerControls(currentDetailCaseId);
 
-  document.getElementById('detail-id').innerText = `CASE #${data.id}`;
+  document.getElementById('detail-id').innerText = `CASE #${displayCaseId}`;
   document.getElementById('detail-name').innerText = data.name;
-  document.getElementById('detail-role').innerText = data.role;
+  document.getElementById('detail-role').innerText = displayRole;
   document.getElementById('detail-target').innerText = data.target;
   document.getElementById('detail-anxiety').innerText = data.anxiety;
   document.getElementById('detail-statement').innerText = `"${data.statement}"`;
